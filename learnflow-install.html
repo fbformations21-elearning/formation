@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnFlow — Installation formation</title>
+<style>
+  body{font-family:sans-serif;background:#f0f4f8;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}
+  .box{background:white;border-radius:16px;padding:2.5rem;max-width:480px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.12);text-align:center;}
+  .logo{font-size:22px;font-weight:700;color:#185FA5;margin-bottom:4px;}
+  .logo span{color:#1D9E75;}
+  .sub{font-size:13px;color:#6b6860;margin-bottom:2rem;}
+  .btn{width:100%;padding:14px;background:#185FA5;color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;}
+  .btn:hover{background:#0C447C;}
+  .btn:disabled{background:#9a9690;cursor:not-allowed;}
+  .status{margin-top:1.25rem;padding:12px 16px;border-radius:10px;font-size:13px;display:none;}
+  .ok{background:#EAF3DE;color:#0F6E56;}
+  .err{background:#FCEBEB;color:#A32D2D;}
+  .info{background:#E6F1FB;color:#0C447C;}
+  .step{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0ede8;font-size:13px;text-align:left;}
+  .step:last-child{border:none;}
+  .step-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+  .s-wait{background:#f0ede8;color:#9a9690;}
+  .s-load{background:#E6F1FB;color:#185FA5;}
+  .s-ok{background:#EAF3DE;color:#1D9E75;}
+  .s-err{background:#FCEBEB;color:#E24B4A;}
+  #steps{margin:1.5rem 0;display:none;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">Learn<span>Flow</span></div>
+  <div class="sub">Installation de la formation Vidéosurveillance</div>
+  <p style="font-size:13px;color:#6b6860;margin-bottom:1.5rem;line-height:1.6">Cliquez sur le bouton ci-dessous pour insérer automatiquement la formation complète dans votre base de données Supabase.</p>
+  <button class="btn" id="btn" onclick="installer()">🚀 Installer la formation</button>
+  <div id="steps">
+    <div class="step" id="s1"><div class="step-icon s-wait" id="i1">1</div><div>Connexion à Supabase</div></div>
+    <div class="step" id="s2"><div class="step-icon s-wait" id="i2">2</div><div>Vérification base de données</div></div>
+    <div class="step" id="s3"><div class="step-icon s-wait" id="i3">3</div><div>Insertion de la formation</div></div>
+    <div class="step" id="s4"><div class="step-icon s-wait" id="i4">4</div><div>Vérification finale</div></div>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+const SUPA_URL='https://oebnvaxvmrmyvuiuuzwh.supabase.co';
+const SUPA_KEY='sb_publishable__oCF5Szn4auhOaUscwtplQ_JYOt-cJ8';
+
+async function supa(method,table,body=null,filter=''){
+  const res=await fetch(`${SUPA_URL}/rest/v1/${table}${filter}`,{
+    method,
+    headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):null
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  if(res.status===204)return null;
+  return res.json();
+}
+
+function setStep(n,state,text){
+  const icons={wait:'s-wait',load:'s-load',ok:'s-ok',err:'s-err'};
+  const labels={wait:n,load:'⟳',ok:'✓',err:'✗'};
+  const el=document.getElementById('i'+n);
+  el.className='step-icon '+icons[state];
+  el.textContent=labels[state];
+  if(text){const s=document.getElementById('s'+n);s.querySelector('div:last-child').textContent=text;}
+}
+
+function showStatus(msg,type){
+  const s=document.getElementById('status');
+  s.style.display='block';
+  s.className='status '+type;
+  s.innerHTML=msg;
+}
+
+const FORMATION = {
+  title:"Vidéosurveillance et Vidéoprotection",
+  desc:"Formation complète pour agents de sécurité — 6 modules : cadre légal, systèmes, installation, exploitation, RGPD, déontologie",
+  duree:"6h00",
+  cat:"Sécurité",
+  niveau:"Intermédiaire",
+  modules:[
+    {id:1,titre:"Cadre juridique et réglementaire",parties:[
+      {titre:"Définitions et distinctions",
+       contenu:"La vidéosurveillance désigne les systèmes installés dans des lieux non ouverts au public, tandis que la vidéoprotection concerne les systèmes sur la voie publique ou dans des lieux ouverts au public.\n\nEn France, la vidéoprotection est régie par la loi du 21 janvier 1995. La vidéosurveillance en entreprise relève du Code du travail et du RGPD.",
+       questions:[
+         {q:"Quelle loi régit la vidéoprotection sur la voie publique ?",opts:["Loi du 6 janvier 1978","Loi du 21 janvier 1995","Code pénal article 226","Loi LOPPSI 1"],answer:1},
+         {q:"La vidéosurveillance s'applique :",opts:["Uniquement sur la voie publique","Dans les lieux non ouverts au public","Partout sans distinction","Uniquement dans les banques"],answer:1},
+         {q:"Quel texte encadre la vidéosurveillance en entreprise ?",opts:["Uniquement la loi de 1995","Le Code du travail et le RGPD","Le Code pénal uniquement","La loi de 2011"],answer:1}
+       ]},
+      {titre:"Autorisations et déclarations",
+       contenu:"Tout système de vidéoprotection dans un lieu ouvert au public nécessite une autorisation préfectorale. L'autorisation est délivrée pour une durée de 5 ans renouvelable.\n\nPour la vidéosurveillance en entreprise, l'employeur doit informer et consulter le CSE avant toute installation.",
+       questions:[
+         {q:"Quelle autorité délivre l'autorisation de vidéoprotection ?",opts:["La mairie","Le préfet","La CNIL","Le tribunal"],answer:1},
+         {q:"Durée d'une autorisation préfectorale ?",opts:["1 an","3 ans","5 ans","10 ans"],answer:2},
+         {q:"Qui doit être consulté avant installation en entreprise ?",opts:["Les clients","Le CSE","Le préfet uniquement","La police"],answer:1}
+       ]},
+      {titre:"Droits des personnes filmées",
+       contenu:"Toute personne filmée dispose du droit à l'information, du droit d'accès aux images et du droit à l'effacement. Les panneaux d'information doivent être visibles.\n\nLe droit d'accès s'exerce auprès du responsable du système.",
+       questions:[
+         {q:"Quel affichage est obligatoire dans un lieu sous vidéoprotection ?",opts:["Aucun","Un panneau visible informant de la surveillance","Uniquement un registre interne","Un affichage à l'entrée principale uniquement"],answer:1},
+         {q:"Une personne filmée peut-elle demander à voir les images ?",opts:["Non jamais","Oui c'est un droit","Oui mais seulement 24h","Uniquement via un avocat"],answer:1},
+         {q:"Qui gère les droits d'accès aux images ?",opts:["La police","Le responsable du système","La CNIL directement","N'importe quel agent"],answer:1}
+       ]},
+      {titre:"Sanctions et infractions",
+       contenu:"L'installation sans autorisation est punie d'un an d'emprisonnement et 45 000€ d'amende. Le détournement d'images est puni de 3 ans et 45 000€.\n\nLa CNIL peut prononcer des sanctions pouvant atteindre 20 millions d'euros ou 4% du CA mondial.",
+       questions:[
+         {q:"Peine pour installation sans autorisation ?",opts:["6 mois et 15 000€","1 an et 45 000€","3 ans et 100 000€","Simple amende"],answer:1},
+         {q:"Quelle autorité sanctionne les manquements RGPD ?",opts:["La préfecture","Le tribunal de commerce","La CNIL","Le ministère de l'intérieur"],answer:2},
+         {q:"Un agent détournant des images risque :",opts:["Un avertissement","3 ans et 45 000€","Uniquement un licenciement","Aucune sanction pénale"],answer:1}
+       ]}
+    ]},
+    {id:2,titre:"Les systèmes de vidéosurveillance",parties:[
+      {titre:"Les caméras et leurs types",
+       contenu:"Les caméras PTZ (Pan-Tilt-Zoom) permettent une rotation et un zoom contrôlables à distance. Les caméras dôme sont discrètes et résistantes au vandalisme. Les caméras fisheye offrent une vision à 360°.\n\nOn distingue les caméras analogiques et les caméras IP (signal numérique via réseau).",
+       questions:[
+         {q:"Que signifie PTZ ?",opts:["Pile Tension Zone","Pan-Tilt-Zoom","Protection Totale Zéro","Protocole Transmission Zonal"],answer:1},
+         {q:"Quel type de caméra offre une vision à 360° ?",opts:["PTZ","Fixe","Fisheye","Dôme"],answer:2},
+         {q:"Différence entre caméra analogique et IP ?",opts:["La couleur","Signal analogique vs numérique réseau","Le prix uniquement","La taille"],answer:1}
+       ]},
+      {titre:"Enregistrement et stockage",
+       contenu:"DVR pour systèmes analogiques, NVR pour systèmes IP. La durée de conservation légale maximale est de 30 jours dans les lieux ouverts au public.\n\nLa compression H.265 est le format le plus récent et efficace.",
+       questions:[
+         {q:"Durée maximale de conservation dans un lieu public ?",opts:["7 jours","15 jours","30 jours","6 mois"],answer:2},
+         {q:"Quel équipement enregistre les caméras IP ?",opts:["DVR","NVR","VCR","SDR"],answer:1},
+         {q:"Format de compression le plus récent ?",opts:["H.261","H.263","H.264","H.265"],answer:3}
+       ]},
+      {titre:"Transmission et réseaux",
+       contenu:"Câble coaxial pour systèmes analogiques, RJ45 ou fibre pour systèmes IP. La sécurisation du réseau est primordiale : réseau dédié, chiffrement des communications.\n\nUn réseau non sécurisé expose le système au piratage et à l'espionnage.",
+       questions:[
+         {q:"Câble utilisé pour caméras analogiques ?",opts:["RJ45","Fibre optique","Câble coaxial","USB"],answer:2},
+         {q:"Pourquoi sécuriser le réseau vidéosurveillance ?",opts:["Améliorer la qualité","Éviter piratage et espionnage","Réduire consommation","Ce n'est pas nécessaire"],answer:1},
+         {q:"Bonne pratique réseau pour vidéosurveillance IP ?",opts:["Wi-Fi public","Réseau partagé","Réseau dédié séparé","Désactiver chiffrement"],answer:2}
+       ]},
+      {titre:"Maintenance et vérification",
+       contenu:"La maintenance régulière comprend : nettoyage des objectifs, contrôle du fonctionnement, vérification de l'enregistrement, test des alarmes et mise à jour des logiciels.\n\nUn registre de maintenance doit être tenu à jour consignant toutes les interventions.",
+       questions:[
+         {q:"Que contient le registre de maintenance ?",opts:["Uniquement les pannes","Toutes les interventions","Les noms des personnes filmées","Les images"],answer:1},
+         {q:"Première action en cas de panne ?",opts:["Réparer soi-même","Ignorer","Signaler au responsable","Appeler la police"],answer:2},
+         {q:"Vérification en maintenance régulière ?",opts:["Changer les caméras chaque mois","Nettoyer objectifs et vérifier enregistrement","Effacer les images","Déplacer les caméras"],answer:1}
+       ]}
+    ]},
+    {id:3,titre:"Installation et mise en œuvre",parties:[
+      {titre:"Étude préalable et implantation",
+       contenu:"Avant installation, analyser les risques, choisir les emplacements stratégiques et éviter les angles morts. L'implantation doit respecter les principes de proportionnalité et nécessité.\n\nIl est interdit de filmer l'intérieur des logements privés ou les espaces de repos des salariés.",
+       questions:[
+         {q:"Qu'est-ce qu'un angle mort ?",opts:["Une caméra en panne","Une zone non couverte par les caméras","Un enregistrement effacé","Une caméra vers le sol"],answer:1},
+         {q:"Peut-on filmer l'intérieur d'un logement privé ?",opts:["Oui si propriétaire d'accord","Non c'est interdit","Oui avec autorisation","Oui la nuit"],answer:1},
+         {q:"Quel principe encadre l'implantation des caméras ?",opts:["Rentabilité","Proportionnalité et nécessité","Visibilité maximale","Discrétion totale"],answer:1}
+       ]},
+      {titre:"Paramétrage et configuration",
+       contenu:"La configuration comprend le réglage des caméras, la configuration de l'enregistrement et le paramétrage des alertes comme la détection de mouvement ou le franchissement de ligne virtuelle.\n\nLa détection intelligente permet de réduire les fausses alarmes.",
+       questions:[
+         {q:"Qu'est-ce que la détection de franchissement de ligne ?",opts:["Détecter pannes câbles","Alerte quand ligne virtuelle franchie","Mesurer longueur câbles","Détecter rayures objectif"],answer:1},
+         {q:"Comment réduire les fausses alarmes ?",opts:["Augmenter résolution","Configurer algorithmes de détection","Désactiver alertes","Filmer uniquement la nuit"],answer:1},
+         {q:"Fréquence d'images minimale pour identifier un individu ?",opts:["1 image/s","5 images/s","25 images/s","100 images/s"],answer:1}
+       ]},
+      {titre:"Signalétique obligatoire",
+       contenu:"Les panneaux doivent mentionner l'existence du système, le nom du responsable et les modalités d'exercice du droit d'accès. Ils doivent être placés à l'entrée des zones surveillées.\n\nL'absence de signalétique constitue une infraction sanctionnable.",
+       questions:[
+         {q:"Que mentionne obligatoirement le panneau ?",opts:["Uniquement le pictogramme","Existence du système et coordonnées responsable","Nombre de caméras","Horaires enregistrement"],answer:1},
+         {q:"Où placer les panneaux ?",opts:["En salle de contrôle","À l'entrée des zones surveillées","Sur chaque caméra","Dans les bureaux"],answer:1},
+         {q:"L'absence de signalétique est-elle sanctionnée ?",opts:["Non c'est facultatif","Oui c'est une infraction","Seulement grandes surfaces","Seulement si plainte"],answer:1}
+       ]},
+      {titre:"Réception et mise en service",
+       contenu:"La mise en service doit faire l'objet d'une réception formelle avec un procès-verbal consignant les tests et anomalies. Tous les opérateurs doivent être formés avant la mise en service.\n\nCe document est conservé pendant toute la durée de fonctionnement.",
+       questions:[
+         {q:"Qu'est-ce qu'un PV de réception ?",opts:["Liste des personnes filmées","Document formalisant tests et conformité","Autorisation préfectorale","Contrat maintenance"],answer:1},
+         {q:"Qui doit être formé avant mise en service ?",opts:["Uniquement responsable technique","Tous les opérateurs","Uniquement agents sécurité","Personne"],answer:1},
+         {q:"Durée de conservation du PV de réception ?",opts:["1 an","5 ans","Durée de fonctionnement","Non obligatoire"],answer:2}
+       ]}
+    ]},
+    {id:4,titre:"Exploitation et supervision",parties:[
+      {titre:"Le poste de supervision",
+       contenu:"Le poste de supervision regroupe moniteurs, enregistreurs, interfaces de contrôle et systèmes d'alarme. La distance recommandée aux écrans est de 50-70 cm.\n\nDes pauses régulières toutes les heures sont nécessaires pour maintenir l'efficacité et réduire la fatigue visuelle.",
+       questions:[
+         {q:"Distance recommandée opérateur-écrans ?",opts:["20-30 cm","50-70 cm","1-2 mètres","Plus de 3 mètres"],answer:1},
+         {q:"Pourquoi des pauses régulières ?",opts:["Économiser électricité","Réduire fatigue visuelle et maintenir efficacité","Obligation légale","Vérifier enregistrements"],answer:1},
+         {q:"Que regroupe le poste de supervision ?",opts:["Uniquement des caméras","Moniteurs enregistreurs interfaces alarmes","Uniquement archives","Les badges"],answer:1}
+       ]},
+      {titre:"Gestion des alarmes et incidents",
+       contenu:"La levée de doute consiste à analyser les images pour confirmer ou infirmer une alerte avant toute intervention. La main courante consigne tous les événements et a valeur légale.\n\nEn cas de confirmation d'incident grave, alerter les secours et le responsable.",
+       questions:[
+         {q:"Qu'est-ce que la levée de doute ?",opts:["Effacer images douteuses","Analyser images pour confirmer ou infirmer alerte","Appeler automatiquement police","Déclencher sirènes"],answer:1},
+         {q:"Quel document consigne tous les événements ?",opts:["Registre autorisation","La main courante","PV de réception","DUERP"],answer:1},
+         {q:"Que faire en cas d'incident grave confirmé ?",opts:["Intervenir seul","Alerter secours et responsable","Attendre fin de poste","Effacer images"],answer:1}
+       ]},
+      {titre:"Extraction et transmission des images",
+       contenu:"Seuls les personnels habilités peuvent extraire des images. La procédure doit être documentée. En cas de réquisition judiciaire, les images doivent être remises.\n\nLa destruction d'images faisant l'objet d'une procédure judiciaire est une infraction grave.",
+       questions:[
+         {q:"Qui peut extraire des images ?",opts:["N'importe quel employé","Uniquement personnels habilités","Tout le monde en urgence","Seulement le directeur"],answer:1},
+         {q:"Risque si destruction d'images en procédure judiciaire ?",opts:["Simple amende","Entrave à la justice","Aucune sanction si accidentel","Avertissement CNIL"],answer:1},
+         {q:"Comment transmettre images aux autorités judiciaires ?",opts:["Par email","Dans enveloppe scellée","Clé USB non protégée","Oralement"],answer:1}
+       ]},
+      {titre:"Habilitation et accès au système",
+       contenu:"Chaque utilisateur dispose d'identifiants personnels. Les droits sont définis selon le profil : opérateur, superviseur, administrateur. Les logs enregistrent toutes les connexions.\n\nLes mots de passe ne doivent jamais être partagés et doivent être changés régulièrement.",
+       questions:[
+         {q:"Pourquoi des identifiants personnels ?",opts:["Simplifier gestion","Tracer accès et responsabiliser","Obligation commerciale","Accélérer connexion"],answer:1},
+         {q:"Que permettent les logs d'accès ?",opts:["Améliorer qualité vidéo","Tracer connexions et identifier anomalies","Augmenter conservation","Réduire consommation"],answer:1},
+         {q:"Bonne pratique pour mots de passe ?",opts:["Les partager entre collègues","Les noter sur post-it","Les changer régulièrement sans les partager","Même mot de passe partout"],answer:2}
+       ]}
+    ]},
+    {id:5,titre:"Protection des données et RGPD",parties:[
+      {titre:"Principes fondamentaux du RGPD",
+       contenu:"Le RGPD est entré en vigueur le 25 mai 2018. Les images de vidéosurveillance sont des données personnelles quand elles permettent d'identifier des individus.\n\nLes principes clés sont : licéité, finalité, minimisation, exactitude, limitation de conservation, intégrité et confidentialité.",
+       questions:[
+         {q:"Depuis quand le RGPD est-il en vigueur ?",opts:["25 mai 2016","25 mai 2018","25 mai 2020","1er janvier 2019"],answer:1},
+         {q:"Les images vidéosurveillance sont-elles des données personnelles ?",opts:["Non jamais","Oui si elles identifient des individus","Seulement en couleur","Seulement si enregistrées"],answer:1},
+         {q:"Que signifie le principe de minimisation ?",opts:["Petites caméras","Collecter seulement le nécessaire","Enregistrement 1 jour","Moins de caméras"],answer:1}
+       ]},
+      {titre:"Obligations du responsable de traitement",
+       contenu:"Le responsable de traitement doit tenir un registre des activités documentant chaque système. Une AIPD peut être obligatoire pour les systèmes à grande échelle.\n\nLe DPO conseille et contrôle le respect du RGPD.",
+       questions:[
+         {q:"Que doit tenir le responsable de traitement ?",opts:["Registre incidents","Registre activités de traitement","Registre visiteurs","Registre pannes"],answer:1},
+         {q:"Que signifie AIPD ?",opts:["Autorisation Individuelle Protection Données","Analyse Impact Protection Données","Agent Instructeur Protection Données","Acte Identification Personnes Détectées"],answer:1},
+         {q:"Rôle du DPO ?",opts:["Installer caméras","Conseiller et contrôler le RGPD","Gérer incidents physiques","Extraire images"],answer:1}
+       ]},
+      {titre:"Sécurité des données",
+       contenu:"Les mesures de sécurité incluent : chiffrement des données, contrôle d'accès physique et logique, traçabilité et sauvegardes régulières.\n\nEn cas de violation de données, notifier la CNIL dans les 72 heures. Si risque élevé, informer aussi les personnes concernées.",
+       questions:[
+         {q:"Délai de notification à la CNIL en cas de violation ?",opts:["24 heures","72 heures","7 jours","1 mois"],answer:1},
+         {q:"Quelle mesure protège les données en transmission ?",opts:["Compression vidéo","Le chiffrement","Augmenter résolution","Désactiver alarmes"],answer:1},
+         {q:"Quand informer les personnes d'une violation ?",opts:["Jamais","Toujours","Quand risque élevé pour leurs droits","Seulement si demandé"],answer:2}
+       ]},
+      {titre:"Durées de conservation et suppression",
+       contenu:"Pour les lieux ouverts au public, la durée maximale est de 30 jours. La suppression doit être automatique à l'échéance.\n\nLes images faisant l'objet d'une procédure judiciaire ne peuvent pas être supprimées jusqu'à clôture de la procédure.",
+       questions:[
+         {q:"Durée maximale conservation lieu public ?",opts:["7 jours","15 jours","30 jours","90 jours"],answer:2},
+         {q:"Peut-on supprimer images en réquisition judiciaire ?",opts:["Oui après 30 jours","Non jusqu'à clôture procédure","Oui si juge ne répond pas","Oui avec accord responsable"],answer:1},
+         {q:"Comment supprimer les images à l'échéance ?",opts:["Manuellement chaque semaine","Automatiquement à l'échéance","Transfert disque externe","Accord CNIL"],answer:1}
+       ]}
+    ]},
+    {id:6,titre:"Déontologie et bonnes pratiques",parties:[
+      {titre:"Secret professionnel et confidentialité",
+       contenu:"L'agent est soumis à une stricte obligation de secret professionnel. La divulgation à des tiers non autorisés constitue une faute grave pouvant engager la responsabilité pénale.\n\nLe partage d'images sur les réseaux sociaux est formellement interdit, même floutées.",
+       questions:[
+         {q:"Un agent peut-il partager des images sur les réseaux sociaux ?",opts:["Oui si floutées","Non c'est interdit","Oui avec accord","Oui hors service"],answer:1},
+         {q:"Risque pour divulgation d'informations confidentielles ?",opts:["Simple rappel","Faute grave et responsabilité pénale","Aucune sanction","Uniquement disciplinaire"],answer:1},
+         {q:"Surveiller un proche via la vidéosurveillance constitue :",opts:["Usage normal","Détournement de finalité sanctionnable","Initiative louable","Acte autorisé hors travail"],answer:1}
+       ]},
+      {titre:"Non-discrimination et neutralité",
+       contenu:"La surveillance ne peut pas être ciblée sur des individus en raison de leur apparence, origine ou religion. Face à un comportement suspect, l'agent se base uniquement sur des faits objectifs et observables.\n\nLe profilage racial est strictement interdit.",
+       questions:[
+         {q:"Sur quelle base cibler la surveillance ?",opts:["Apparence physique","Origine supposée","Faits objectifs et observables","Style vestimentaire"],answer:2},
+         {q:"Le profilage racial est-il autorisé ?",opts:["Oui en zones sensibles","Non strictement interdit","Oui avec autorisation","Oui en menace terroriste"],answer:1},
+         {q:"La neutralité s'applique-t-elle à la reconnaissance faciale ?",opts:["Non ces systèmes sont objectifs","Oui elle s'applique","Seulement systèmes publics","Seulement en présence opérateur"],answer:1}
+       ]},
+      {titre:"Gestion des situations sensibles",
+       contenu:"La vidéosurveillance dans les vestiaires et sanitaires est strictement interdite. En cas de crise, l'agent peut transmettre les images en temps réel aux forces de l'ordre.\n\nL'agent ne doit jamais intervenir physiquement sur le terrain sauf si sa mission le prévoit expressément.",
+       questions:[
+         {q:"Vidéosurveillance vestiaires et sanitaires ?",opts:["Oui avec accord CSE","Non strictement interdit","Oui la nuit uniquement","Oui pour ERP"],answer:1},
+         {q:"En cas de crise, que peut faire l'agent ?",opts:["Intervenir physiquement","Transmettre images aux forces de l'ordre","Effacer les images","Quitter le poste"],answer:1},
+         {q:"Limite d'intervention de l'agent ?",opts:["Il peut tout faire en urgence","Attributions strictement définies","Peut intervenir si nécessaire","Aucune limite hors heures"],answer:1}
+       ]},
+      {titre:"Formation continue et veille réglementaire",
+       contenu:"La carte professionnelle d'agent de sécurité doit être renouvelée tous les 5 ans. La veille réglementaire est essentielle car les textes et recommandations de la CNIL évoluent régulièrement.\n\nLes autorisations préfectorales doivent être renouvelées tous les 5 ans.",
+       questions:[
+         {q:"Validité de la carte professionnelle agent sécurité ?",opts:["1 an","3 ans","5 ans","10 ans"],answer:2},
+         {q:"Pourquoi la veille réglementaire est-elle importante ?",opts:["Rédiger rapports","Les textes évoluent et les pratiques doivent s'adapter","Uniquement pour responsables","Sans impact pratique"],answer:1},
+         {q:"Fréquence renouvellement autorisations préfectorales ?",opts:["Tous les ans","Tous les 3 ans","Tous les 5 ans","Permanentes"],answer:2}
+       ]}
+    ]}
+  ]
+};
+
+async function installer(){
+  const btn=document.getElementById('btn');
+  btn.disabled=true;btn.textContent='Installation en cours...';
+  document.getElementById('steps').style.display='block';
+
+  try{
+    // Étape 1 - Connexion
+    setStep(1,'load','Connexion à Supabase...');
+    await new Promise(r=>setTimeout(r,500));
+    setStep(1,'ok','Connexion établie ✓');
+
+    // Étape 2 - Vérification
+    setStep(2,'load','Vérification de la base de données...');
+    const existing=await supa('GET','formations','',`?select=id&data->>title=eq.Vidéosurveillance et Vidéoprotection`);
+    if(existing&&existing.length>0){
+      setStep(2,'ok','Formation déjà présente');
+      setStep(3,'ok','Insertion ignorée (déjà installée)');
+      setStep(4,'ok','Installation vérifiée');
+      showStatus('✅ La formation est déjà installée dans votre base de données !<br><br>Vous pouvez fermer cette page et utiliser votre <a href="https://fbformations21-elearning.github.io/formation/learnflow-admin.html" style="color:#185FA5">portail admin</a>.','ok');
+      btn.textContent='✓ Déjà installé';
+      return;
+    }
+    setStep(2,'ok','Base de données prête ✓');
+
+    // Étape 3 - Insertion
+    setStep(3,'load','Insertion de la formation...');
+    await supa('POST','formations',{data:FORMATION},'');
+    setStep(3,'ok','Formation insérée ✓');
+
+    // Étape 4 - Vérification finale
+    setStep(4,'load','Vérification finale...');
+    await new Promise(r=>setTimeout(r,500));
+    setStep(4,'ok','Installation réussie ✓');
+
+    showStatus('🎉 <strong>Installation réussie !</strong><br><br>La formation Vidéosurveillance et Vidéoprotection (6 modules · 24 parties · 72 questions) est maintenant disponible dans votre base de données.<br><br><a href="https://fbformations21-elearning.github.io/formation/learnflow-admin.html" style="color:#185FA5;font-weight:600">→ Ouvrir le portail admin</a>','ok');
+    btn.textContent='✓ Installation terminée';
+
+  }catch(e){
+    showStatus('❌ Erreur : '+e.message+'<br><br>Vérifiez votre connexion internet et réessayez.','err');
+    btn.disabled=false;btn.textContent='🔄 Réessayer';
+    console.error(e);
+    const steps=['s1','s2','s3','s4'];
+    steps.forEach((s,i)=>{if(document.getElementById('i'+(i+1)).classList.contains('s-load'))setStep(i+1,'err','Erreur');});
+  }
+}
+</script>
+</body>
+</html>
