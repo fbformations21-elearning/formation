@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnFlow Academy — Administration</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:#185FA5;--blue-l:#E6F1FB;--blue-d:#0C447C;
+    --green:#1D9E75;--green-l:#EAF3DE;--green-d:#0F6E56;
+    --amber:#BA7517;--amber-l:#FAEEDA;--amber-d:#854F0B;
+    --red:#E24B4A;--red-l:#FCEBEB;--red-d:#A32D2D;
+    --gray:#f8f7f5;--gray2:#f0ede8;--gray3:#e0ddd7;--gray4:#9a9690;
+    --text:#1a1917;--text2:#6b6860;--text3:#9a9690;
+    --white:#fff;--r:10px;--rl:14px;--rxl:20px;
+    --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+    --shl:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--gray);min-height:100vh;font-size:14px;line-height:1.5;}
+  #login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0C447C 0%,#185FA5 50%,#1D9E75 100%);display:flex;align-items:center;justify-content:center;z-index:9999;}
+  .login-box{background:white;border-radius:var(--rxl);padding:2.5rem;width:380px;box-shadow:var(--shl);}
+  .login-logo{font-size:22px;font-weight:600;color:var(--blue);margin-bottom:4px;}
+  .login-logo span{color:var(--green);}
+  .login-sub{font-size:13px;color:var(--text2);margin-bottom:2rem;}
+  .lbl{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500;}
+  .linput{width:100%;padding:10px 14px;border:1.5px solid var(--gray3);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:white;transition:border-color .2s;}
+  .linput:focus{outline:none;border-color:var(--blue);}
+  .lbtn{width:100%;padding:11px;background:var(--blue);color:white;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;margin-top:1.25rem;transition:background .2s;}
+  .lbtn:hover{background:var(--blue-d);}
+  .lerr{background:var(--red-l);color:var(--red-d);font-size:12px;padding:8px 12px;border-radius:var(--r);margin-top:10px;display:none;}
+  #app{display:none;min-height:100vh;}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:white;border-right:1px solid var(--gray3);display:flex;flex-direction:column;z-index:100;}
+  .sl{padding:1.25rem 1.25rem 1rem;border-bottom:1px solid var(--gray3);}
+  .sl-t{font-size:16px;font-weight:600;color:var(--blue);}
+  .sl-t span{color:var(--green);}
+  .sl-s{font-size:11px;color:var(--text3);margin-top:2px;}
+  .snav{flex:1;padding:1rem .75rem;overflow-y:auto;}
+  .nsec{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 .5rem;margin:1rem 0 .5rem;}
+  .nsec:first-child{margin-top:0;}
+  .ni{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);cursor:pointer;color:var(--text2);font-size:13px;transition:all .15s;margin-bottom:2px;}
+  .ni:hover{background:var(--gray);color:var(--text);}
+  .ni.active{background:var(--blue-l);color:var(--blue);font-weight:500;}
+  .nic{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+  .nbadge{margin-left:auto;background:var(--blue);color:white;font-size:10px;padding:1px 6px;border-radius:99px;font-weight:500;}
+  .sfoot{padding:1rem;border-top:1px solid var(--gray3);}
+  .suser{display:flex;align-items:center;gap:8px;}
+  .sav{width:32px;height:32px;border-radius:50%;background:var(--blue);color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+  .sun{font-size:13px;font-weight:500;}
+  .sur{font-size:11px;color:var(--text3);}
+  .lout{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:4px;border-radius:6px;}
+  .lout:hover{color:var(--red);background:var(--red-l);}
+  .main{margin-left:220px;min-height:100vh;}
+  .topbar{background:white;border-bottom:1px solid var(--gray3);padding:0 1.75rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+  .tb-t{font-size:16px;font-weight:600;}
+  .tb-a{display:flex;align-items:center;gap:10px;}
+  .content{padding:1.75rem;}
+  .page{display:none;}
+  .page.active{display:block;}
+  .card{background:white;border-radius:var(--rl);border:1px solid var(--gray3);padding:1.25rem;box-shadow:var(--sh);}
+  .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+  .ct{font-size:14px;font-weight:600;}
+  .mg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+  .mc{background:white;border-radius:var(--rl);border:1px solid var(--gray3);padding:1.25rem;box-shadow:var(--sh);}
+  .mi{width:40px;height:40px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:.75rem;}
+  .mv{font-size:28px;font-weight:600;line-height:1;margin-bottom:4px;}
+  .ml{font-size:12px;color:var(--text2);}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;border:1.5px solid var(--gray3);background:white;color:var(--text);line-height:1;}
+  .btn:hover{background:var(--gray);}
+  .btn:active{transform:scale(.98);}
+  .bp{background:var(--blue);color:white;border-color:var(--blue);}
+  .bp:hover{background:var(--blue-d);border-color:var(--blue-d);}
+  .bs{background:var(--green);color:white;border-color:var(--green);}
+  .bs:hover{background:var(--green-d);}
+  .bd{background:var(--red);color:white;border-color:var(--red);}
+  .bd:hover{background:var(--red-d);}
+  .bsm{padding:5px 11px;font-size:12px;}
+  .bxs{padding:3px 8px;font-size:11px;border-radius:6px;}
+  .fg{margin-bottom:1rem;}
+  .fr{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .fl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block;}
+  .fi,.fs,.fta{width:100%;padding:9px 12px;border:1.5px solid var(--gray3);border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:white;transition:border-color .2s;}
+  .fi:focus,.fs:focus,.fta:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.08);}
+  .fta{resize:vertical;min-height:80px;}
+  .fh{font-size:11px;color:var(--text3);margin-top:4px;}
+  .tw{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{padding:10px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;background:var(--gray);border-bottom:1px solid var(--gray3);}
+  tbody td{padding:11px 12px;border-bottom:1px solid var(--gray3);vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--gray);}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:500;}
+  .bb{background:var(--blue-l);color:var(--blue-d);}
+  .bg{background:var(--green-l);color:var(--green-d);}
+  .ba{background:var(--amber-l);color:var(--amber-d);}
+  .br{background:var(--red-l);color:var(--red-d);}
+  .bgr{background:var(--gray2);color:var(--text2);}
+  .prog{height:6px;background:var(--gray2);border-radius:99px;overflow:hidden;}
+  .pb{height:100%;border-radius:99px;transition:width .4s;}
+  .pb-b{background:var(--blue);}
+  .pb-g{background:var(--green);}
+  .mo{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:500;backdrop-filter:blur(2px);}
+  .mo.hidden{display:none;}
+  .modal{background:white;border-radius:var(--rxl);padding:1.75rem;width:92%;max-width:520px;box-shadow:var(--shl);max-height:90vh;overflow-y:auto;animation:mi .2s ease;}
+  .mw{max-width:700px;}
+  @keyframes mi{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+  .mt{font-size:17px;font-weight:600;margin-bottom:1.25rem;}
+  .mf{display:flex;gap:8px;justify-content:flex-end;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--gray3);}
+  .tabs{display:flex;border-bottom:1px solid var(--gray3);margin-bottom:1.25rem;}
+  .tab{padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);}
+  .alert{padding:10px 14px;border-radius:var(--r);font-size:13px;margin-bottom:1rem;}
+  .al-s{background:var(--green-l);color:var(--green-d);}
+  .al-i{background:var(--blue-l);color:var(--blue-d);}
+  .al-d{background:var(--red-l);color:var(--red-d);}
+  .qopt{padding:10px 14px;border:1.5px solid var(--gray3);border-radius:var(--r);cursor:pointer;font-size:13px;margin-bottom:7px;transition:all .15s;display:flex;align-items:center;gap:8px;}
+  .qopt:hover{border-color:var(--blue);background:var(--blue-l);}
+  .qopt.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue-d);}
+  .qopt.ok{border-color:var(--green);background:var(--green-l);color:var(--green-d);cursor:default;}
+  .qopt.ko{border-color:var(--red);background:var(--red-l);color:var(--red-d);cursor:default;}
+  .cert{background:linear-gradient(145deg,#f0f7ff 0%,#e8f5f0 100%);border:2px solid #B5D4F4;border-radius:var(--rxl);padding:2.5rem 2rem;text-align:center;position:relative;overflow:hidden;}
+  .cert::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;border-radius:50%;background:rgba(24,95,165,.06);}
+  .cert-seal{position:absolute;bottom:20px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--blue);color:white;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(24,95,165,.3);}
+  .lr{display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--gray);border-radius:var(--r);margin-bottom:8px;}
+  .ldot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+  .ldot.on{background:var(--green);}
+  .ldot.off{background:var(--red);}
+  .lurl{font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);word-break:break-all;cursor:pointer;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-l);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+  .qb{background:var(--gray);border-radius:var(--r);padding:12px;margin-bottom:10px;border:1px solid var(--gray3);}
+  .or{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .orad{width:16px;height:16px;cursor:pointer;accent-color:var(--green);flex-shrink:0;}
+  .sr{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray3);}
+  .sr:last-child{border:none;}
+  .tgl{position:relative;width:40px;height:22px;flex-shrink:0;}
+  .tgl input{opacity:0;width:0;height:0;}
+  .tsl{position:absolute;inset:0;background:var(--gray3);border-radius:99px;cursor:pointer;transition:background .2s;}
+  .tsl::before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:white;border-radius:50%;transition:transform .2s;}
+  .tgl input:checked+.tsl{background:var(--green);}
+  .tgl input:checked+.tsl::before{transform:translateX(18px);}
+  .sbar{display:flex;align-items:center;gap:8px;background:var(--gray);border:1.5px solid var(--gray3);border-radius:var(--r);padding:7px 12px;}
+  .sbar input{background:none;border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);width:200px;}
+  .sbar input::placeholder{color:var(--text3);}
+  .sbar:focus-within{border-color:var(--blue);background:white;}
+  .notif{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:12px 18px;border-radius:var(--rl);font-size:13px;font-weight:500;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;max-width:320px;box-shadow:var(--shl);}
+  .notif.show{opacity:1;transform:none;}
+  .notif.ok{background:var(--green-d);}
+  .notif.err{background:var(--red-d);}
+  .empty{text-align:center;padding:3rem 1rem;color:var(--text3);}
+  .ei{font-size:36px;margin-bottom:12px;}
+  .et{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:4px;}
+  @media print{.sidebar,.topbar,.notif,.mf,.btn{display:none!important}.main{margin:0}.cert{border:2px solid #185FA5}}
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Learn<span>Flow</span></div>
+    <div class="login-sub">Portail d'administration · Formation à distance</div>
+    <div style="margin-top:1.5rem;">
+      <div class="fg"><label class="lbl">Identifiant</label><input class="linput" id="lu" type="text" placeholder="admin" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fg"><label class="lbl">Mot de passe</label><input class="linput" id="lp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="lbtn" onclick="doLogin()">Connexion →</button>
+      <div class="lerr" id="lerr">Identifiant ou mot de passe incorrect.</div>
+    </div>
+    <div style="font-size:11px;color:#9a9690;margin-top:1.25rem;text-align:center;">Identifiants par défaut : <strong>admin</strong> / <strong>admin1234</strong><br>Modifiables dans Paramètres</div>
+    <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #e0ddd7;text-align:center;">
+      <div style="font-size:11px;color:#9a9690;margin-bottom:8px;">Identifiants oubliés ?</div>
+      <button onclick="resetCreds()" style="background:none;border:1px solid #e0ddd7;border-radius:8px;padding:7px 16px;font-family:'DM Sans',sans-serif;font-size:12px;color:#6b6860;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#f0ede8'" onmouseout="this.style.background='none'">🔓 Réinitialiser les identifiants</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sl"><div class="sl-t">Learn<span>Flow</span></div><div class="sl-s">Administration</div></div>
+    <nav class="snav">
+      <div class="nsec">Principal</div>
+      <div class="ni active" onclick="showPage('dashboard')"><span class="nic">⊞</span> Tableau de bord</div>
+      <div class="ni" onclick="showPage('formations')"><span class="nic">📚</span> Formations <span class="nbadge" id="nb-f">0</span></div>
+      <div class="ni" onclick="showPage('apprenants')"><span class="nic">👥</span> Apprenants <span class="nbadge" id="nb-a">0</span></div>
+      <div class="nsec">Accès & Suivi</div>
+      <div class="ni" onclick="showPage('liens')"><span class="nic">🔗</span> Liens d'accès <span class="nbadge" id="nb-l">0</span></div>
+      <div class="ni" onclick="showPage('certificats')"><span class="nic">🏆</span> Certificats <span class="nbadge" id="nb-c">0</span></div>
+      <div class="ni" onclick="showPage('evaluations')"><span class="nic">📊</span> Évaluations</div>
+      <div class="nsec">Configuration</div>
+      <div class="ni" onclick="showPage('parametres')"><span class="nic">⚙</span> Paramètres</div>
+    </nav>
+    <div class="sfoot">
+      <div class="suser">
+        <div class="sav" id="sav">AD</div>
+        <div style="flex:1;min-width:0;"><div class="sun" id="sun">Administrateur</div><div class="sur">Super Admin</div></div>
+        <button class="lout" onclick="logout()" title="Déconnexion">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-t" id="tbt">Tableau de bord</div>
+      <div class="tb-a">
+        <div class="sbar"><span style="color:var(--text3)">🔍</span><input type="text" placeholder="Rechercher..."></div>
+        <button class="btn bp bsm" id="tba" onclick="topbarAction()" style="display:none">+ Nouveau</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="mg">
+          <div class="mc"><div class="mi" style="background:var(--blue-l)">📚</div><div class="mv" style="color:var(--blue)" id="m-f">0</div><div class="ml">Formations</div></div>
+          <div class="mc"><div class="mi" style="background:var(--green-l)">👥</div><div class="mv" style="color:var(--green)" id="m-a">0</div><div class="ml">Apprenants</div></div>
+          <div class="mc"><div class="mi" style="background:var(--amber-l)">🔗</div><div class="mv" style="color:var(--amber)" id="m-l">0</div><div class="ml">Liens actifs</div></div>
+          <div class="mc"><div class="mi" style="background:var(--green-l)">🏆</div><div class="mv" style="color:var(--green)" id="m-c">0</div><div class="ml">Certificats</div></div>
+        </div>
+        <div class="g2" style="margin-bottom:1rem">
+          <div class="card"><div class="ch"><div class="ct">Formations</div><button class="btn bsm" onclick="showPage('formations')">Voir tout</button></div><div id="d-f"></div></div>
+          <div class="card"><div class="ch"><div class="ct">Apprenants</div><button class="btn bsm" onclick="showPage('apprenants')">Voir tout</button></div><div id="d-a"></div></div>
+        </div>
+        <div class="card"><div class="ch"><div class="ct">Liens récents</div><button class="btn bp bsm" onclick="showPage('liens')">Gérer</button></div><div id="d-l"></div></div>
+      </div>
+
+      <!-- FORMATIONS -->
+      <div id="page-formations" class="page"><div id="fl"></div></div>
+
+      <!-- APPRENANTS -->
+      <div id="page-apprenants" class="page">
+        <div class="card"><div class="tw"><table><thead><tr><th>Apprenant</th><th>Email</th><th>Entreprise</th><th>Progression</th><th>Certificats</th><th>Actions</th></tr></thead><tbody id="atb"></tbody></table></div></div>
+      </div>
+
+      <!-- LIENS -->
+      <div id="page-liens" class="page">
+        <div class="alert al-i" style="margin-bottom:1rem">
+          💡 <strong>Comment ça marche :</strong> Générez un lien pour chaque stagiaire, copiez-le et envoyez-le par email. Le stagiaire clique sur le lien, saisit son token et accède à sa formation sur <strong id="base-url-display">votre-domaine.fr/stagiaire.html</strong>
+        </div>
+        <div class="card"><div id="ll"></div></div>
+      </div>
+
+      <!-- CERTIFICATS -->
+      <div id="page-certificats" class="page">
+        <div class="alert al-i">🎓 Certificats émis automatiquement pour les évaluations ≥ <strong id="sd">70</strong>%</div>
+        <div id="cg"></div>
+      </div>
+
+      <!-- ÉVALUATIONS -->
+      <div id="page-evaluations" class="page">
+        <div class="card"><div class="tw"><table><thead><tr><th>Apprenant</th><th>Formation</th><th>Score</th><th>Résultat</th><th>Date</th><th>Certificat</th></tr></thead><tbody id="etb"></tbody></table></div></div>
+      </div>
+
+      <!-- PARAMÈTRES -->
+      <div id="page-parametres" class="page">
+        <div class="g2">
+          <div>
+            <div class="card" style="margin-bottom:1rem">
+              <div class="ct" style="margin-bottom:1rem">Identifiants admin</div>
+              <div class="fg"><label class="fl">Identifiant</label><input class="fi" id="pu" type="text"></div>
+              <div class="fg"><label class="fl">Nouveau mot de passe</label><input class="fi" id="pp" type="password" placeholder="Laisser vide pour ne pas modifier"></div>
+              <div class="fg"><label class="fl">Confirmer</label><input class="fi" id="pp2" type="password"></div>
+              <button class="btn bp bsm" onclick="saveCreds()">Enregistrer</button>
+            </div>
+            <div class="card">
+              <div class="ct" style="margin-bottom:1rem">URL du portail stagiaire</div>
+              <div class="fg"><label class="fl">Adresse complète du fichier stagiaire.html</label><input class="fi" id="purl" type="text" placeholder="https://votresite.fr/formation/stagiaire.html"></div>
+              <div class="fh">Cette URL sera incluse dans les liens générés pour vos stagiaires</div>
+              <button class="btn bp bsm" style="margin-top:.75rem" onclick="saveBaseUrl()">Enregistrer</button>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:1rem">
+              <div class="ct" style="margin-bottom:1rem">Plateforme</div>
+              <div class="fg"><label class="fl">Nom de la plateforme</label><input class="fi" id="pn" type="text"></div>
+              <div class="fg"><label class="fl">Organisation</label><input class="fi" id="po" type="text"></div>
+              <div class="fg"><label class="fl">Seuil de réussite (%)</label><input class="fi" id="ps" type="number" min="1" max="100"></div>
+              <button class="btn bp bsm" onclick="savePlatform()">Enregistrer</button>
+            </div>
+            <div class="card">
+              <div class="ct" style="margin-bottom:1rem">Données</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn bsm" onclick="exportJSON()">📥 Export JSON</button>
+                <button class="btn bsm" onclick="exportCSV()">📋 Export CSV</button>
+                <button class="btn bd bsm" onclick="if(confirm('Réinitialiser ?'))resetData()">⚠ Réinitialiser</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORMATION -->
+<div id="mf-modal" class="mo hidden">
+  <div class="modal mw">
+    <div class="mt" id="mf-title">Nouvelle formation</div>
+    <input type="hidden" id="ef-id">
+    <div class="tabs">
+      <div class="tab active" onclick="ftab('i')">Informations</div>
+      <div class="tab" onclick="ftab('q')">Questions QCM</div>
+    </div>
+    <div id="ftab-i">
+      <div class="fr"><div class="fg"><label class="fl">Titre *</label><input class="fi" id="ft" placeholder="Ex: Sécurité incendie"></div><div class="fg"><label class="fl">Catégorie</label><select class="fs" id="fc"><option>Réglementaire</option><option>Technique</option><option>Management</option><option>Sécurité</option><option>Commercial</option><option>RH</option><option>Qualité</option></select></div></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fta" id="fd" placeholder="Objectifs pédagogiques..."></textarea></div>
+      <div class="fr"><div class="fg"><label class="fl">Durée estimée</label><input class="fi" id="fdu" placeholder="Ex: 2h30"></div><div class="fg"><label class="fl">Niveau</label><select class="fs" id="fn"><option>Débutant</option><option>Intermédiaire</option><option>Avancé</option></select></div></div>
+    </div>
+    <div id="ftab-q" style="display:none"><div id="qed"></div><button class="btn bsm" onclick="addQ()" style="margin-top:8px">+ Ajouter une question</button></div>
+    <div class="mf"><button class="btn" onclick="closeM('mf-modal')">Annuler</button><button class="btn bp" onclick="saveFormation()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- MODAL APPRENANT -->
+<div id="ma-modal" class="mo hidden">
+  <div class="modal">
+    <div class="mt" id="ma-title">Nouvel apprenant</div>
+    <input type="hidden" id="ea-id">
+    <div class="fr"><div class="fg"><label class="fl">Prénom *</label><input class="fi" id="ap" placeholder="Marie"></div><div class="fg"><label class="fl">Nom *</label><input class="fi" id="an" placeholder="Dupont"></div></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" id="ae" type="email" placeholder="marie@entreprise.fr"></div>
+    <div class="fr"><div class="fg"><label class="fl">Entreprise</label><input class="fi" id="aen" placeholder="Service RH"></div><div class="fg"><label class="fl">Poste</label><input class="fi" id="aps" placeholder="Responsable formation"></div></div>
+    <div class="fg"><label class="fl">Notes internes</label><textarea class="fta" id="ano" rows="2"></textarea></div>
+    <div class="mf"><button class="btn" onclick="closeM('ma-modal')">Annuler</button><button class="btn bp" onclick="saveApprenant()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- MODAL LIEN -->
+<div id="ml-modal" class="mo hidden">
+  <div class="modal">
+    <div class="mt">Générer un lien d'accès</div>
+    <div class="fg"><label class="fl">Formation *</label><select class="fs" id="lf"></select></div>
+    <div class="fg"><label class="fl">Apprenant *</label><select class="fs" id="la"></select></div>
+    <div class="fr">
+      <div class="fg"><label class="fl">Durée de validité</label><select class="fs" id="ld"><option value="1">1 jour</option><option value="3">3 jours</option><option value="7" selected>7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option><option value="90">3 mois</option></select></div>
+      <div class="fg"><label class="fl">Accès maximum</label><select class="fs" id="lac"><option value="1">1 accès</option><option value="3">3 accès</option><option value="5" selected>5 accès</option><option value="10">10 accès</option><option value="-1">Illimité</option></select></div>
+    </div>
+    <div id="glb" style="display:none">
+      <div class="alert al-s">✅ Lien généré ! Copiez-le et envoyez-le par email au stagiaire.</div>
+      <div style="background:var(--gray);border-radius:var(--r);padding:12px 14px;">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:500;">🔗 Lien à envoyer au stagiaire :</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--blue);word-break:break-all;cursor:pointer;" id="glt" onclick="copyGL()"></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px;">Cliquez sur le lien pour copier</div>
+      </div>
+      <div style="background:var(--gray2);border-radius:var(--r);padding:10px 14px;margin-top:10px;font-size:12px;color:var(--text2);">
+        📧 <strong>Exemple d'email :</strong><br>
+        "Bonjour, voici votre lien d'accès à la formation : [lien]. Cliquez dessus pour commencer."
+      </div>
+    </div>
+    <div class="mf"><button class="btn" onclick="closeM('ml-modal')">Fermer</button><button class="btn bp" id="glbtn" onclick="genLien()">Générer</button></div>
+  </div>
+</div>
+
+<!-- MODAL QUIZ PREVIEW -->
+<div id="mq-modal" class="mo hidden">
+  <div class="modal mw">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="mt" id="qt" style="margin:0">Évaluation</div>
+      <span class="badge bb" id="qc">1/5</span>
+    </div>
+    <div class="prog" style="margin-bottom:1.25rem"><div class="pb pb-b" id="qpb" style="width:0%"></div></div>
+    <div id="qbody"></div>
+    <div class="mf"><button class="btn" id="qcbtn" onclick="closeM('mq-modal')">Annuler</button><button class="btn bp" id="qnbtn" onclick="qNext()">Suivant →</button></div>
+  </div>
+</div>
+
+<!-- MODAL CERTIFICAT -->
+<div id="mc-modal" class="mo hidden">
+  <div class="modal">
+    <div class="mt">Certificat de réalisation</div>
+    <div id="cp"></div>
+    <div class="mf"><button class="btn" onclick="closeM('mc-modal')">Fermer</button><button class="btn bs" onclick="window.print()">🖨 Imprimer / PDF</button></div>
+  </div>
+</div>
+
+<!-- MODAL DETAIL APPRENANT -->
+<div id="md-modal" class="mo hidden">
+  <div class="modal mw">
+    <div class="mt" id="dd-t">Détail apprenant</div>
+    <div id="dd-b"></div>
+    <div class="mf"><button class="btn" onclick="closeM('md-modal')">Fermer</button><button class="btn bp" id="dd-edit">Modifier</button></div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+const SK='lf_data_v4',CK='lf_creds';
+function getCreds(){try{return JSON.parse(localStorage.getItem(CK))||{user:'admin',pass:'admin1234'}}catch{return{user:'admin',pass:'admin1234'}}}
+function setCreds(c){localStorage.setItem(CK,JSON.stringify(c))}
+function defState(){
+  const now=Date.now();
+  return{
+    platform:{nom:'LearnFlow Academy',org:'Formation à distance',seuil:70,baseUrl:''},
+    formations:[
+      {id:1,title:'Vidéosurveillance et Vidéoprotection',desc:'Formation complète pour agents de sécurité — 6 modules : cadre légal, systèmes, installation, exploitation, RGPD, déontologie',duree:'6h00',cat:'Sécurité',niveau:'Intermédiaire',
+       modules:[
+        {id:1,titre:'Cadre juridique et réglementaire',parties:[
+          {titre:'Définitions et distinctions',contenu:'La vidéosurveillance désigne les systèmes installés dans des lieux non ouverts au public (usage privé, interne à une entreprise), tandis que la vidéoprotection concerne les systèmes installés sur la voie publique ou dans des lieux ouverts au public. Cette distinction est fondamentale car les régimes juridiques applicables diffèrent.\n\nEn France, la vidéoprotection sur la voie publique est régie par la loi du 21 janvier 1995 (dite loi PASQUA), modifiée par la LOPPSI 2 de 2011. La vidéosurveillance en entreprise relève quant à elle du Code du travail et du RGPD.',questions:[
+            {q:'Quelle loi régit principalement la vidéoprotection sur la voie publique en France ?',opts:['Loi du 6 janvier 1978','Loi du 21 janvier 1995','Loi du 18 mars 2003','Code pénal article 226'],answer:1},
+            {q:'La vidéosurveillance s\'applique :',opts:['Uniquement sur la voie publique','Dans les lieux non ouverts au public','Partout sans distinction','Uniquement dans les banques'],answer:1},
+            {q:'Quel texte encadre la vidéosurveillance en entreprise ?',opts:['Uniquement la loi de 1995','Le Code du travail et le RGPD','Le Code pénal uniquement','La loi de 2011 uniquement'],answer:1}
+          ]},
+          {titre:'Autorisations et déclarations',contenu:'Tout système de vidéoprotection dans un lieu ouvert au public nécessite une autorisation préfectorale préalable. La demande est instruite par une commission départementale de vidéoprotection. L\'autorisation est délivrée pour une durée de 5 ans renouvelable.\n\nPour la vidéosurveillance en entreprise, l\'employeur doit informer et consulter le Comité Social et Économique (CSE) avant toute installation. Les salariés doivent être informés individuellement de l\'existence du système.',questions:[
+            {q:'Quelle autorité délivre l\'autorisation de vidéoprotection dans les lieux publics ?',opts:['La mairie','Le préfet','La CNIL','Le tribunal'],answer:1},
+            {q:'Quelle est la durée d\'une autorisation préfectorale de vidéoprotection ?',opts:['1 an','3 ans','5 ans','10 ans'],answer:2},
+            {q:'Qui doit être consulté avant l\'installation d\'un système en entreprise ?',opts:['Les clients','Le CSE (Comité Social et Économique)','Le préfet uniquement','La police nationale'],answer:1}
+          ]},
+          {titre:'Droits des personnes filmées',contenu:'Toute personne filmée dispose de droits fondamentaux : le droit à l\'information (signalétique obligatoire), le droit d\'accès aux images la concernant, et le droit à l\'effacement. Les panneaux d\'information doivent être visibles et mentionner l\'existence du système, l\'identité du responsable et les modalités d\'exercice des droits.\n\nLe droit d\'accès s\'exerce auprès du responsable du système. La demande doit être traitée dans un délai raisonnable.',questions:[
+            {q:'Quel affichage est obligatoire dans un lieu sous vidéoprotection ?',opts:['Aucun affichage requis','Un panneau visible informant de la surveillance','Uniquement un registre interne','Un affichage uniquement à l\'entrée principale'],answer:1},
+            {q:'Une personne filmée peut-elle demander à voir les images la concernant ?',opts:['Non, jamais','Oui, c\'est un droit','Oui, mais seulement les images de moins de 24h','Uniquement via un avocat'],answer:1},
+            {q:'Qui est responsable de la gestion des droits d\'accès aux images ?',opts:['La police','Le responsable du système de vidéoprotection','La CNIL directement','N\'importe quel agent de sécurité'],answer:1}
+          ]},
+          {titre:'Sanctions et infractions',contenu:'Les manquements à la réglementation peuvent entraîner des sanctions pénales et administratives sévères. L\'installation sans autorisation est punie d\'un an d\'emprisonnement et 45 000€ d\'amende. Le détournement d\'images est puni de 3 ans d\'emprisonnement et 45 000€ d\'amende.\n\nLa CNIL peut prononcer des sanctions administratives pouvant atteindre 20 millions d\'euros ou 4% du chiffre d\'affaires annuel mondial pour les manquements au RGPD.',questions:[
+            {q:'Quelle est la peine maximale pour installation de vidéosurveillance sans autorisation ?',opts:['6 mois et 15 000€','1 an et 45 000€','3 ans et 100 000€','Simple amende administrative'],answer:1},
+            {q:'Quelle autorité peut sanctionner les manquements au RGPD ?',opts:['La préfecture','Le tribunal de commerce','La CNIL','Le ministère de l\'intérieur'],answer:2},
+            {q:'Un agent qui détourne des images à des fins personnelles risque :',opts:['Un simple avertissement','3 ans d\'emprisonnement et 45 000€ d\'amende','Uniquement un licenciement','Aucune sanction pénale'],answer:1}
+          ]}
+        ]},
+        {id:2,titre:'Les systèmes de vidéosurveillance',parties:[
+          {titre:'Les caméras et leurs types',contenu:'Il existe plusieurs types de caméras adaptés à différents usages. Les caméras fixes offrent une surveillance permanente d\'un angle précis. Les caméras PTZ (Pan-Tilt-Zoom) permettent une rotation horizontale, verticale et un zoom, contrôlables à distance. Les caméras dôme sont discrètes et résistantes au vandalisme. Les caméras fisheye offrent une vision à 360°.\n\nOn distingue également les caméras analogiques (signal vidéo classique) et les caméras IP (signal numérique via réseau informatique).',questions:[
+            {q:'Que signifie PTZ pour une caméra ?',opts:['Pile, Tension, Zone','Pan-Tilt-Zoom','Protocole de Transmission Zonal','Protection Totale Zéro'],answer:1},
+            {q:'Quel type de caméra offre une vision à 360° ?',opts:['Caméra PTZ','Caméra fixe','Caméra fisheye','Caméra dôme'],answer:2},
+            {q:'Quelle est la différence principale entre caméra analogique et IP ?',opts:['La couleur du boîtier','Le signal : analogique vs numérique via réseau','Le prix uniquement','La taille de l\'objectif'],answer:1}
+          ]},
+          {titre:'Enregistrement et stockage',contenu:'Les images peuvent être enregistrées sur différents supports : DVR (Digital Video Recorder) pour les systèmes analogiques, NVR (Network Video Recorder) pour les systèmes IP, ou dans le cloud. La durée de conservation légale maximale est de 30 jours dans les lieux ouverts au public.\n\nLa résolution d\'enregistrement impacte la qualité des images et l\'espace de stockage nécessaire. La compression vidéo (H.264, H.265) permet de réduire la taille des fichiers.',questions:[
+            {q:'Quelle est la durée maximale de conservation des images dans un lieu public ?',opts:['7 jours','15 jours','30 jours','6 mois'],answer:2},
+            {q:'Quel équipement enregistre les images d\'un système de caméras IP ?',opts:['DVR','NVR','VCR','SDR'],answer:1},
+            {q:'Quel format de compression vidéo est le plus récent et efficace ?',opts:['H.261','H.263','H.264','H.265'],answer:3}
+          ]},
+          {titre:'Transmission et réseaux',contenu:'La transmission des images peut s\'effectuer par câble coaxial (systèmes analogiques), câble réseau RJ45/fibre optique (systèmes IP), ou sans fil (Wi-Fi, 4G/5G). La sécurisation du réseau de vidéosurveillance est primordiale : réseau dédié séparé du réseau informatique général, chiffrement des communications, authentification forte.',questions:[
+            {q:'Quel type de câble est utilisé pour les systèmes de caméras analogiques ?',opts:['RJ45','Fibre optique','Câble coaxial','USB'],answer:2},
+            {q:'Pourquoi faut-il sécuriser le réseau de vidéosurveillance ?',opts:['Pour améliorer la qualité d\'image','Pour éviter le piratage et l\'espionnage','Pour réduire la consommation électrique','Ce n\'est pas nécessaire'],answer:1},
+            {q:'Quelle bonne pratique réseau est recommandée pour la vidéosurveillance IP ?',opts:['Utiliser le réseau Wi-Fi public','Partager le réseau avec les postes informatiques','Créer un réseau dédié et séparé','Désactiver le chiffrement pour plus de rapidité'],answer:2}
+          ]},
+          {titre:'Maintenance et vérification',contenu:'Un système de vidéosurveillance nécessite une maintenance régulière : nettoyage des objectifs, contrôle du fonctionnement, vérification de l\'enregistrement, test des alarmes et mise à jour des logiciels. Un registre de maintenance doit être tenu à jour. En cas de panne, l\'agent signale immédiatement au responsable et met en place des mesures compensatoires.',questions:[
+            {q:'Que doit contenir le registre de maintenance ?',opts:['Uniquement les pannes','Toutes les interventions réalisées sur le système','Les noms des personnes filmées','Les images enregistrées'],answer:1},
+            {q:'En cas de panne d\'une caméra, quelle est la première action de l\'agent ?',opts:['Réparer lui-même la caméra','Ignorer la panne','Signaler immédiatement au responsable','Appeler la police'],answer:2},
+            {q:'Quelle vérification fait partie de la maintenance régulière ?',opts:['Changer les caméras chaque mois','Nettoyer les objectifs et vérifier l\'enregistrement','Effacer toutes les images','Déplacer les caméras régulièrement'],answer:1}
+          ]}
+        ]},
+        {id:3,titre:'Installation et mise en œuvre',parties:[
+          {titre:'Étude préalable et implantation',contenu:'Avant toute installation, une étude préalable est indispensable : analyse des risques, choix des emplacements stratégiques, et prise en compte des contraintes techniques. L\'implantation des caméras doit respecter les principes de proportionnalité et de nécessité. Il est interdit de filmer l\'intérieur des logements privés ou des espaces de repos des salariés.',questions:[
+            {q:'Qu\'est-ce qu\'un angle mort en vidéosurveillance ?',opts:['Une caméra en panne','Une zone non couverte par les caméras','Un enregistrement effacé','Une caméra orientée vers le sol'],answer:1},
+            {q:'Peut-on installer une caméra filmant l\'intérieur d\'un logement privé ?',opts:['Oui si le propriétaire est d\'accord','Non, c\'est interdit','Oui avec autorisation préfectorale','Oui la nuit uniquement'],answer:1},
+            {q:'Quel principe juridique encadre le choix d\'implantation des caméras ?',opts:['Principe de rentabilité','Principe de proportionnalité et de nécessité','Principe de visibilité maximale','Principe de discrétion totale'],answer:1}
+          ]},
+          {titre:'Paramétrage et configuration',contenu:'La configuration comprend : le réglage des caméras (angle, mise au point, exposition), la configuration de l\'enregistrement (résolution, fréquence d\'images, durée), et le paramétrage des alertes (détection de mouvement, franchissement de ligne virtuelle). La détection intelligente permet de réduire les fausses alarmes.',questions:[
+            {q:'Qu\'est-ce que la détection de franchissement de ligne ?',opts:['Détecter les pannes de câbles','Déclencher une alerte quand une ligne virtuelle est franchie','Mesurer la longueur des câbles','Détecter les rayures sur l\'objectif'],answer:1},
+            {q:'Comment réduire les fausses alarmes sur un système intelligent ?',opts:['Augmenter la résolution au maximum','Configurer correctement les algorithmes de détection','Désactiver toutes les alertes','Filmer uniquement la nuit'],answer:1},
+            {q:'Quelle est la fréquence d\'images minimale recommandée pour identifier un individu ?',opts:['1 image/seconde','5 images/seconde','25 images/seconde','100 images/seconde'],answer:1}
+          ]},
+          {titre:'Signalétique obligatoire',contenu:'La loi impose un affichage visible informant le public de l\'existence d\'un système de vidéoprotection. Les panneaux doivent mentionner l\'existence du système, le nom du responsable et les modalités d\'exercice du droit d\'accès. Ils doivent être placés à l\'entrée des zones surveillées. L\'absence de signalétique constitue une infraction.',questions:[
+            {q:'Que doit obligatoirement mentionner le panneau de signalétique ?',opts:['Uniquement le pictogramme caméra','L\'existence du système et les coordonnées du responsable','Le nombre de caméras installées','Les horaires d\'enregistrement'],answer:1},
+            {q:'Où doivent être placés les panneaux de signalétique ?',opts:['Uniquement en salle de contrôle','À l\'entrée des zones surveillées','Sur chaque caméra','Dans les bureaux de direction'],answer:1},
+            {q:'L\'absence de signalétique est-elle sanctionnée ?',opts:['Non, c\'est facultatif','Oui, c\'est une infraction','Seulement dans les grandes surfaces','Seulement si une plainte est déposée'],answer:1}
+          ]},
+          {titre:'Réception et mise en service',contenu:'La mise en service doit faire l\'objet d\'une réception formelle : vérification de la conformité, test de chaque caméra, vérification de l\'enregistrement et formation des utilisateurs. Un procès-verbal de réception est établi, consignant les tests et anomalies. Tous les opérateurs doivent être formés avant la mise en service.',questions:[
+            {q:'Qu\'est-ce qu\'un procès-verbal de réception ?',opts:['Un document listant les personnes filmées','Un document formalisant les tests et la conformité','Une autorisation préfectorale','Un contrat de maintenance'],answer:1},
+            {q:'Qui doit être formé avant la mise en service du système ?',opts:['Uniquement le responsable technique','Tous les opérateurs utilisant le système','Uniquement les agents de sécurité','Personne, le système est automatique'],answer:1},
+            {q:'Combien de temps le procès-verbal de réception doit-il être conservé ?',opts:['1 an','5 ans','Pendant toute la durée de fonctionnement','Il n\'est pas obligatoire de le conserver'],answer:2}
+          ]}
+        ]},
+        {id:4,titre:'Exploitation et supervision',parties:[
+          {titre:'Le poste de supervision',contenu:'Le poste de supervision est le centre névralgique du système. Il regroupe moniteurs, enregistreurs, interfaces de contrôle et systèmes d\'alarme. L\'ergonomie est primordiale : distance de 50-70 cm aux écrans, éclairage indirect, pauses régulières toutes les heures, limitation du nombre d\'images surveillées simultanément.',questions:[
+            {q:'Quelle est la distance recommandée entre l\'opérateur et les écrans ?',opts:['20-30 cm','50-70 cm','1-2 mètres','Plus de 3 mètres'],answer:1},
+            {q:'Pourquoi prévoir des pauses régulières pour l\'opérateur ?',opts:['Pour économiser l\'électricité','Pour réduire la fatigue visuelle et maintenir l\'efficacité','C\'est obligatoire légalement','Pour vérifier les enregistrements'],answer:1},
+            {q:'Que regroupe le poste de supervision ?',opts:['Uniquement des caméras','Moniteurs, enregistreurs, interfaces de contrôle et alarmes','Uniquement les archives vidéo','Les badges d\'accès du personnel'],answer:1}
+          ]},
+          {titre:'Gestion des alarmes et incidents',contenu:'Face à une alarme, l\'agent doit suivre une procédure précise. La levée de doute consiste à analyser les images pour confirmer ou infirmer l\'alerte. En cas de confirmation, l\'agent alerte les secours et le responsable. La main courante consigne tous les événements : heure, nature, actions entreprises. Ce document a valeur légale.',questions:[
+            {q:'Qu\'est-ce que la "levée de doute" ?',opts:['Effacer les images douteuses','Analyser les images pour confirmer ou infirmer une alerte','Appeler automatiquement la police','Déclencher les sirènes d\'alarme'],answer:1},
+            {q:'Quel document consigne tous les événements survenus au poste ?',opts:['Le registre d\'autorisation','La main courante','Le procès-verbal de réception','Le DUERP'],answer:1},
+            {q:'Que faire en cas de confirmation d\'un incident grave ?',opts:['Intervenir seul immédiatement','Alerter les secours appropriés et le responsable','Attendre la fin du poste','Effacer les images compromettantes'],answer:1}
+          ]},
+          {titre:'Extraction et transmission des images',contenu:'L\'extraction d\'images à des fins probatoires est un acte encadré. Seuls les personnels habilités peuvent extraire des images. La procédure doit être documentée. En cas de réquisition judiciaire, l\'exploitant est tenu de remettre les images. La destruction d\'images faisant l\'objet d\'une procédure judiciaire constitue une infraction grave.',questions:[
+            {q:'Qui peut extraire des images du système de vidéosurveillance ?',opts:['N\'importe quel employé','Uniquement les personnels habilités','Tout le monde en cas d\'urgence','Seulement le directeur'],answer:1},
+            {q:'Que risque-t-on en détruisant des images faisant l\'objet d\'une procédure judiciaire ?',opts:['Une simple amende administrative','Une infraction pour entrave à la justice','Aucune sanction si c\'est accidentel','Un avertissement de la CNIL'],answer:1},
+            {q:'Comment doivent être transmises les images aux autorités judiciaires ?',opts:['Par email','Dans une enveloppe scellée','Sur une clé USB non protégée','Oralement lors d\'une audition'],answer:1}
+          ]},
+          {titre:'Habilitation et accès au système',contenu:'L\'accès au système doit être strictement contrôlé. Chaque utilisateur dispose d\'identifiants personnels. Les droits sont définis selon le profil : opérateur (visualisation), superviseur (visualisation + extraction), administrateur (configuration complète). Les logs enregistrent toutes les connexions. Les mots de passe ne doivent jamais être partagés.',questions:[
+            {q:'Pourquoi chaque utilisateur doit-il avoir ses propres identifiants ?',opts:['Pour simplifier la gestion','Pour tracer les accès et responsabiliser chaque utilisateur','C\'est une obligation commerciale','Pour accélérer la connexion'],answer:1},
+            {q:'Que permettent les logs d\'accès ?',opts:['Améliorer la qualité vidéo','Tracer les connexions et identifier les utilisations anormales','Augmenter la durée de conservation','Réduire la consommation électrique'],answer:1},
+            {q:'Quelle bonne pratique s\'applique aux mots de passe ?',opts:['Les partager entre collègues pour plus d\'efficacité','Les noter sur un post-it visible','Les changer régulièrement et ne pas les partager','Utiliser le même mot de passe partout'],answer:2}
+          ]}
+        ]},
+        {id:5,titre:'Protection des données et RGPD',parties:[
+          {titre:'Principes fondamentaux du RGPD',contenu:'Le RGPD, entré en vigueur le 25 mai 2018, s\'applique aux images de vidéosurveillance car elles permettent d\'identifier des individus. Les principes clés sont : licéité, finalité, minimisation (collecter seulement le nécessaire), exactitude, limitation de conservation, intégrité et confidentialité. Le responsable de traitement doit pouvoir prouver sa conformité.',questions:[
+            {q:'Depuis quand le RGPD est-il en vigueur ?',opts:['25 mai 2016','25 mai 2018','25 mai 2020','1er janvier 2019'],answer:1},
+            {q:'Les images de vidéosurveillance sont-elles des données personnelles ?',opts:['Non jamais','Oui si elles permettent d\'identifier des individus','Seulement si elles sont en couleur','Seulement si elles sont enregistrées'],answer:1},
+            {q:'Que signifie le principe de "minimisation" du RGPD ?',opts:['Utiliser des caméras de petite taille','Collecter seulement les données strictement nécessaires','Réduire la durée d\'enregistrement à 1 jour','Avoir le moins de caméras possible'],answer:1}
+          ]},
+          {titre:'Obligations du responsable de traitement',contenu:'Le responsable de traitement doit tenir un registre des activités de traitement documentant chaque système. Ce registre précise les finalités, les personnes concernées, les destinataires, les durées de conservation et les mesures de sécurité. Une AIPD (Analyse d\'Impact relative à la Protection des Données) peut être obligatoire pour les systèmes à grande échelle.',questions:[
+            {q:'Que doit tenir le responsable de traitement ?',opts:['Un registre des incidents uniquement','Un registre des activités de traitement','Un registre des visiteurs','Un registre des pannes'],answer:1},
+            {q:'Que signifie AIPD ?',opts:['Autorisation Individuelle de Protection des Données','Analyse d\'Impact relative à la Protection des Données','Agent Instructeur de Protection des Données','Acte d\'Identification des Personnes Détectées'],answer:1},
+            {q:'Quel est le rôle du DPO ?',opts:['Installer les caméras','Conseiller et contrôler le respect du RGPD','Gérer les incidents de sécurité physique','Extraire les images pour la justice'],answer:1}
+          ]},
+          {titre:'Sécurité des données',contenu:'La sécurité des données vidéo est une obligation légale. Les mesures incluent : chiffrement des données, contrôle d\'accès physique et logique, traçabilité, sauvegardes régulières. En cas de violation de données, le responsable doit notifier la CNIL dans les 72 heures. Si le risque est élevé, les personnes concernées doivent également être informées.',questions:[
+            {q:'Dans quel délai une violation de données doit-elle être notifiée à la CNIL ?',opts:['24 heures','72 heures','7 jours','1 mois'],answer:1},
+            {q:'Quelle mesure protège les données vidéo pendant leur transmission ?',opts:['La compression vidéo','Le chiffrement','L\'augmentation de la résolution','La désactivation des alarmes'],answer:1},
+            {q:'Quand doit-on informer les personnes d\'une violation de données ?',opts:['Jamais','Toujours systématiquement','Quand le risque pour leurs droits est élevé','Seulement si elles le demandent'],answer:2}
+          ]},
+          {titre:'Durées de conservation et suppression',contenu:'Les durées de conservation doivent correspondre à la finalité et ne pas l\'excéder. Pour les lieux ouverts au public, la durée maximale est de 30 jours. La suppression doit être automatique à l\'échéance. Les images faisant l\'objet d\'une procédure judiciaire ne peuvent pas être supprimées jusqu\'à clôture de la procédure.',questions:[
+            {q:'Quelle est la durée maximale de conservation dans un lieu ouvert au public ?',opts:['7 jours','15 jours','30 jours','90 jours'],answer:2},
+            {q:'Peut-on supprimer des images faisant l\'objet d\'une réquisition judiciaire ?',opts:['Oui après 30 jours','Non, jusqu\'à clôture de la procédure','Oui si le juge ne répond pas sous 48h','Oui avec accord du responsable'],answer:1},
+            {q:'Comment doit s\'effectuer la suppression des images à l\'échéance ?',opts:['Manuellement par un agent chaque semaine','Automatiquement à l\'échéance du délai','En les transférant sur un disque externe','En demandant l\'accord de la CNIL'],answer:1}
+          ]}
+        ]},
+        {id:6,titre:'Déontologie et bonnes pratiques',parties:[
+          {titre:'Secret professionnel et confidentialité',contenu:'L\'agent est soumis à une stricte obligation de secret professionnel. Toutes les informations auxquelles il a accès sont confidentielles. La divulgation à des tiers non autorisés constitue une faute grave pouvant engager la responsabilité pénale. Le partage d\'images sur les réseaux sociaux est formellement interdit.',questions:[
+            {q:'Un agent peut-il partager des images de surveillance sur les réseaux sociaux ?',opts:['Oui si les visages sont floutés','Non, c\'est formellement interdit','Oui avec accord du responsable','Oui si c\'est dans un but humoristique'],answer:1},
+            {q:'Que risque un agent qui divulgue des informations confidentielles ?',opts:['Un simple rappel à l\'ordre','Une faute grave et une responsabilité pénale','Aucune sanction','Uniquement une sanction disciplinaire interne'],answer:1},
+            {q:'Utiliser la vidéosurveillance pour surveiller un proche constitue :',opts:['Un usage normal dans certains cas','Un détournement de finalité sanctionnable','Une initiative louable','Un acte autorisé hors des heures de travail'],answer:1}
+          ]},
+          {titre:'Non-discrimination et neutralité',contenu:'L\'agent doit exercer ses fonctions avec une totale neutralité et sans discrimination. La surveillance ne peut pas être ciblée sur des individus en raison de leur apparence, origine ou religion. Face à un comportement suspect, l\'agent se base uniquement sur des faits objectifs et observables, pas sur des suppositions liées à l\'apparence.',questions:[
+            {q:'Sur quelle base peut-on cibler la surveillance d\'un individu ?',opts:['Son apparence physique','Son origine supposée','Des faits objectifs et observables','Son style vestimentaire'],answer:2},
+            {q:'Le profilage racial en vidéosurveillance est-il autorisé ?',opts:['Oui dans les zones sensibles','Non, il est strictement interdit','Oui avec autorisation préfectorale','Oui en cas de menace terroriste'],answer:1},
+            {q:'La neutralité s\'applique-t-elle aux systèmes de reconnaissance faciale ?',opts:['Non, ces systèmes sont objectifs par nature','Oui, elle s\'applique également','Seulement pour les systèmes publics','Seulement en présence de l\'opérateur'],answer:1}
+          ]},
+          {titre:'Gestion des situations sensibles',contenu:'Certaines situations nécessitent une attention particulière : la vidéosurveillance dans les vestiaires et sanitaires est strictement interdite. En cas de crise (prise d\'otages, attentat), des procédures spécifiques s\'appliquent. L\'agent ne doit jamais intervenir physiquement sur le terrain sauf si sa mission le prévoit expressément.',questions:[
+            {q:'La vidéosurveillance dans les vestiaires et sanitaires est-elle autorisée ?',opts:['Oui avec accord du CSE','Non, c\'est strictement interdit','Oui uniquement la nuit','Oui pour les établissements recevant du public'],answer:1},
+            {q:'En cas de crise, que peut faire l\'agent de vidéosurveillance ?',opts:['Intervenir physiquement sur le terrain','Transmettre les images en temps réel aux forces de l\'ordre','Effacer les images pour ne pas gêner','Quitter le poste de surveillance'],answer:1},
+            {q:'Quelle est la limite d\'intervention de l\'agent de vidéosurveillance ?',opts:['Il peut tout faire en cas d\'urgence','Ses attributions sont strictement définies par sa mission','Il peut intervenir physiquement si nécessaire','Il n\'a aucune limite en dehors des heures légales'],answer:1}
+          ]},
+          {titre:'Formation continue et veille réglementaire',contenu:'Le domaine de la vidéosurveillance évolue constamment. L\'agent doit maintenir ses compétences à jour par une formation continue régulière. La carte professionnelle, obligatoire pour les agents de sécurité privée, doit être renouvelée tous les 5 ans. La veille réglementaire est essentielle car les textes et recommandations de la CNIL évoluent régulièrement.',questions:[
+            {q:'Quelle est la durée de validité de la carte professionnelle d\'agent de sécurité ?',opts:['1 an','3 ans','5 ans','10 ans'],answer:2},
+            {q:'Pourquoi la veille réglementaire est-elle importante ?',opts:['Pour rédiger des rapports annuels','Parce que les textes évoluent et les pratiques doivent s\'adapter','Uniquement pour les responsables','C\'est une obligation sans impact pratique'],answer:1},
+            {q:'À quelle fréquence les autorisations préfectorales doivent-elles être renouvelées ?',opts:['Tous les ans','Tous les 3 ans','Tous les 5 ans','Elles sont permanentes'],answer:2}
+          ]}
+        ]}
+       ],
+       questions:[
+        {q:'Quelle loi régit principalement la vidéoprotection sur la voie publique ?',opts:['Loi du 6 janvier 1978','Loi du 21 janvier 1995','Code pénal article 226','Loi LOPPSI 1'],answer:1},
+        {q:'Quelle est la durée maximale de conservation des images dans un lieu public ?',opts:['7 jours','15 jours','30 jours','6 mois'],answer:2},
+        {q:'Que signifie PTZ ?',opts:['Pile Tension Zone','Pan-Tilt-Zoom','Protection Totale Zéro','Protocole de Transmission Zonal'],answer:1},
+        {q:'Dans quel délai notifier la CNIL en cas de violation de données ?',opts:['24h','48h','72h','1 semaine'],answer:2},
+        {q:'Un agent peut-il partager des images sur les réseaux sociaux ?',opts:['Oui si floutées','Non, c\'est interdit','Oui avec accord','Oui hors service'],answer:1}
+       ]
+      }
+    ],
+    apprenants:[
+      {id:1,prenom:'Marie',nom:'Dupont',email:'marie.dupont@entreprise.fr',entreprise:'Service RH',poste:'Responsable RH',notes:''},
+      {id:2,prenom:'Lucas',nom:'Bernard',email:'l.bernard@acmecorp.fr',entreprise:'Direction Technique',poste:'Ingénieur',notes:''},
+      {id:3,prenom:'Sophie',nom:'Martin',email:'s.martin@fabrique.fr',entreprise:'Production',poste:'Chef d\'atelier',notes:''},
+      {id:4,prenom:'Antoine',nom:'Leroy',email:'a.leroy@consulting.fr',entreprise:'Cabinet Conseil',poste:'Consultant',notes:''},
+      {id:5,prenom:'Camille',nom:'Petit',email:'c.petit@formation.fr',entreprise:'Formation Continue',poste:'Formatrice',notes:''}
+    ],
+    liens:[
+      {id:1,fid:1,aid:1,token:'LF-A1B2C3',expiry:new Date(now+5*86400000).toISOString(),acces:5,used:1,active:true},
+      {id:2,fid:2,aid:2,token:'LF-D4E5F6',expiry:new Date(now-86400000).toISOString(),acces:3,used:3,active:true},
+      {id:3,fid:3,aid:3,token:'LF-G7H8I9',expiry:new Date(now+12*86400000).toISOString(),acces:5,used:0,active:true},
+      {id:4,fid:1,aid:4,token:'LF-J1K2L3',expiry:new Date(now+3*86400000).toISOString(),acces:-1,used:2,active:true}
+    ],
+    certificats:[
+      {id:1,aid:1,fid:1,score:80,date:new Date(now-2*86400000).toISOString()},
+      {id:2,aid:2,fid:2,score:100,date:new Date(now-86400000).toISOString()}
+    ],
+    evaluations:[
+      {id:1,aid:1,fid:1,score:80,passed:true,date:new Date(now-2*86400000).toISOString()},
+      {id:2,aid:2,fid:2,score:100,passed:true,date:new Date(now-86400000).toISOString()},
+      {id:3,aid:3,fid:1,score:40,passed:false,date:new Date(now-3*86400000).toISOString()}
+    ],
+    progressions:{},
+    ids:{f:4,a:6,l:5,c:3,e:4}
+  }
+}
+function loadS(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):defState()}catch{return defState()}}
+function saveS(){localStorage.setItem(SK,JSON.stringify(S))}
+let S=loadS();
+
+// LOGIN
+function resetCreds(){
+  if(confirm('Réinitialiser les identifiants ?\n\nLes identifiants seront remis à :\n• Identifiant : admin\n• Mot de passe : admin1234\n\nVos formations, apprenants et liens ne seront PAS supprimés.')){
+    localStorage.removeItem('lf_creds');
+    document.getElementById('lu').value='admin';
+    document.getElementById('lp').value='admin1234';
+    document.getElementById('lerr').style.display='none';
+    const box=document.querySelector('.login-box');
+    const msg=document.createElement('div');
+    msg.style.cssText='background:#EAF3DE;color:#0F6E56;border-radius:10px;padding:10px 14px;font-size:13px;margin-top:12px;text-align:center;';
+    msg.textContent='✅ Identifiants réinitialisés ! Cliquez sur Connexion.';
+    box.appendChild(msg);
+    setTimeout(()=>msg.remove(),4000);
+  }
+}
+function doLogin(){
+  const c=getCreds();
+  if(document.getElementById('lu').value.trim()===c.user&&document.getElementById('lp').value===c.pass){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('sav').textContent=c.user.slice(0,2).toUpperCase();
+    document.getElementById('sun').textContent=c.user;
+    initApp();
+  }else{document.getElementById('lerr').style.display='block';}
+}
+function logout(){document.getElementById('app').style.display='none';document.getElementById('login-screen').style.display='flex';document.getElementById('lu').value='';document.getElementById('lp').value='';}
+function initApp(){updateBadges();loadParams();showPage('dashboard');}
+
+// NAV
+const PTITLES={dashboard:'Tableau de bord',formations:'Formations',apprenants:'Apprenants',liens:'Liens d\'accès',certificats:'Certificats',evaluations:'Évaluations',parametres:'Paramètres'};
+const PACTIONS={formations:'mf-modal',apprenants:'ma-modal',liens:'ml-modal'};
+let curPage='dashboard';
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('tbt').textContent=PTITLES[p]||p;
+  const pages=['dashboard','formations','apprenants','liens','certificats','evaluations','parametres'];
+  const idx=pages.indexOf(p);
+  if(idx>=0)document.querySelectorAll('.ni')[idx].classList.add('active');
+  const btn=document.getElementById('tba');
+  btn.style.display=PACTIONS[p]?'inline-flex':'none';
+  curPage=p;renderPage(p);
+}
+function topbarAction(){
+  if(curPage==='formations')openNewF();
+  else if(curPage==='apprenants')openNewA();
+  else if(curPage==='liens')openNewL();
+}
+function renderPage(p){
+  if(p==='dashboard')renderDash();
+  if(p==='formations')renderF();
+  if(p==='apprenants')renderA();
+  if(p==='liens')renderL();
+  if(p==='certificats')renderC();
+  if(p==='evaluations')renderE();
+  if(p==='parametres')loadParams();
+}
+function updateBadges(){
+  const now=new Date();
+  document.getElementById('nb-f').textContent=S.formations.length;
+  document.getElementById('nb-a').textContent=S.apprenants.length;
+  document.getElementById('nb-l').textContent=S.liens.filter(l=>l.active&&new Date(l.expiry)>now).length;
+  document.getElementById('nb-c').textContent=S.certificats.length;
+}
+
+// DASHBOARD
+function renderDash(){
+  const now=new Date();
+  document.getElementById('m-f').textContent=S.formations.length;
+  document.getElementById('m-a').textContent=S.apprenants.length;
+  document.getElementById('m-l').textContent=S.liens.filter(l=>l.active&&new Date(l.expiry)>now).length;
+  document.getElementById('m-c').textContent=S.certificats.length;
+  document.getElementById('d-f').innerHTML=S.formations.slice(0,3).map(f=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray3)"><div style="width:36px;height:36px;border-radius:var(--r);background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:16px">${fi(f.cat)}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">${f.title}</div><div style="font-size:11px;color:var(--text2)">${f.duree} · ${f.cat}</div></div><span class="badge bb">${f.questions.length}Q</span></div>`).join('')||'<div class="empty" style="padding:1rem"><div class="et">Aucune formation</div></div>';
+  document.getElementById('d-a').innerHTML=S.apprenants.slice(0,4).map(a=>{const p=getProg(a.id);return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray3)"><div class="avatar">${a.prenom[0]}${a.nom[0]}</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">${a.prenom} ${a.nom}</div><div style="font-size:11px;color:var(--text2)">${a.entreprise}</div></div><div style="width:70px"><div class="prog" style="margin-bottom:3px"><div class="pb ${p===100?'pb-g':'pb-b'}" style="width:${p}%"></div></div><div style="font-size:10px;color:var(--text3);text-align:right">${p}%</div></div></div>`}).join('')||'<div class="empty" style="padding:1rem"><div class="et">Aucun apprenant</div></div>';
+  document.getElementById('d-l').innerHTML=S.liens.slice(0,3).map(l=>{const f=S.formations.find(x=>x.id===l.fid),a=S.apprenants.find(x=>x.id===l.aid),exp=new Date(l.expiry)<now,on=l.active&&!exp;return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray3)"><div style="width:8px;height:8px;border-radius:50%;background:${on?'var(--green)':'var(--red)'};flex-shrink:0"></div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">${f?f.title:'—'} → ${a?a.prenom+' '+a.nom:'—'}</div><div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">${getUrl(l.token)}</div></div><span class="badge ${on?'bg':'br'}">${on?'Actif':'Expiré'}</span></div>`}).join('')||'<div style="padding:1rem;text-align:center;color:var(--text3);font-size:13px">Aucun lien</div>';
+}
+
+// FORMATIONS
+function renderF(){
+  document.getElementById('fl').innerHTML=S.formations.length?S.formations.map(f=>`<div class="card" style="margin-bottom:12px"><div style="display:flex;align-items:flex-start;gap:14px"><div style="width:48px;height:48px;border-radius:var(--r);background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${fi(f.cat)}</div><div style="flex:1;min-width:0"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px"><div><div style="font-size:15px;font-weight:600">${f.title}</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${f.desc}</div></div><span class="badge bb" style="flex-shrink:0">${f.cat}</span></div><div style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-bottom:12px"><span>⏱ ${f.duree}</span><span>📊 ${f.niveau}</span><span>❓ ${f.questions.length} questions</span><span>👤 ${S.liens.filter(l=>l.fid===f.id).length} lien(s)</span><span>🏆 ${S.certificats.filter(c=>c.fid===f.id).length} cert.</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn bsm" onclick="openEditF(${f.id})">✏ Modifier</button><button class="btn bp bsm" onclick="openLienForF(${f.id})">🔗 Générer lien</button><button class="btn bsm" onclick="previewQ(${f.id})">▶ Aperçu quiz</button><button class="btn bd bsm" onclick="delF(${f.id})">✕</button></div></div></div></div>`).join(''):'<div class="empty"><div class="ei">📚</div><div class="et">Aucune formation</div><div>Cliquez sur "+ Nouveau" pour commencer</div></div>';
+}
+function fi(c){return{Sécurité:'🔥',Réglementaire:'📋',Management:'👥',Technique:'⚙',Commercial:'💼',RH:'🧑‍💼',Qualité:'✅'}[c]||'📚'}
+let ceq=[];
+function openNewF(){document.getElementById('ef-id').value='';document.getElementById('mf-title').textContent='Nouvelle formation';['ft','fd','fdu'].forEach(id=>document.getElementById(id).value='');document.getElementById('fc').value='Réglementaire';document.getElementById('fn').value='Débutant';ceq=[{q:'',opts:['','','',''],answer:0}];ftab('i');openM('mf-modal');}
+function openEditF(id){const f=S.formations.find(x=>x.id===id);if(!f)return;document.getElementById('ef-id').value=id;document.getElementById('mf-title').textContent='Modifier';document.getElementById('ft').value=f.title;document.getElementById('fd').value=f.desc;document.getElementById('fdu').value=f.duree;document.getElementById('fc').value=f.cat;document.getElementById('fn').value=f.niveau||'Débutant';ceq=JSON.parse(JSON.stringify(f.questions));ftab('i');openM('mf-modal');}
+function ftab(t){document.querySelectorAll('#mf-modal .tab').forEach((x,i)=>x.classList.toggle('active',(i===0&&t==='i')||(i===1&&t==='q')));document.getElementById('ftab-i').style.display=t==='i'?'':'none';document.getElementById('ftab-q').style.display=t==='q'?'':'none';if(t==='q')renderQed();}
+function renderQed(){document.getElementById('qed').innerHTML=ceq.map((q,qi)=>`<div class="qb"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span style="font-size:11px;font-weight:600;color:var(--text3)">Question ${qi+1}</span><button class="btn bxs bd" onclick="rmQ(${qi})" ${ceq.length<=1?'disabled':''}>✕</button></div><div class="fg" style="margin-bottom:8px"><input class="fi" value="${esc(q.q)}" placeholder="Intitulé de la question" oninput="ceq[${qi}].q=this.value"></div>${q.opts.map((o,oi)=>`<div class="or"><input type="radio" class="orad" name="an${qi}" ${q.answer===oi?'checked':''} onchange="ceq[${qi}].answer=${oi}" title="Bonne réponse"><input class="fi" style="flex:1" value="${esc(o)}" placeholder="Option ${String.fromCharCode(65+oi)}" oninput="ceq[${qi}].opts[${oi}]=this.value"></div>`).join('')}<div style="font-size:11px;color:var(--text3);margin-top:4px">🔘 Sélectionnez la bonne réponse</div></div>`).join('')}
+function addQ(){ceq.push({q:'',opts:['','','',''],answer:0});renderQed();}
+function rmQ(i){if(ceq.length>1){ceq.splice(i,1);renderQed();}}
+function saveFormation(){
+  const title=document.getElementById('ft').value.trim();
+  if(!title){notif('Titre obligatoire','err');return;}
+  const id=document.getElementById('ef-id').value;
+  const data={title,desc:document.getElementById('fd').value||'',duree:document.getElementById('fdu').value||'N/A',cat:document.getElementById('fc').value,niveau:document.getElementById('fn').value,questions:ceq.filter(q=>q.q.trim())};
+  if(!data.questions.length)data.questions=[{q:'Question par défaut',opts:['A','B','C','D'],answer:0}];
+  if(id){Object.assign(S.formations.find(x=>x.id===parseInt(id)),data);notif('Formation mise à jour','ok');}
+  else{data.id=S.ids.f++;S.formations.push(data);notif('Formation créée','ok');}
+  saveS();updateBadges();closeM('mf-modal');renderF();
+}
+function delF(id){if(!confirm('Supprimer cette formation ?'))return;S.formations=S.formations.filter(x=>x.id!==id);saveS();updateBadges();renderF();notif('Supprimée');}
+
+// APPRENANTS
+function renderA(){
+  document.getElementById('atb').innerHTML=S.apprenants.length?S.apprenants.map(a=>{const p=getProg(a.id),c=S.certificats.filter(x=>x.aid===a.id).length;return`<tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar">${a.prenom[0]}${a.nom[0]}</div><div><div style="font-weight:500">${a.prenom} ${a.nom}</div><div style="font-size:11px;color:var(--text2)">${a.poste||''}</div></div></div></td><td style="font-size:12px;color:var(--text2)">${a.email}</td><td style="font-size:12px">${a.entreprise}</td><td style="width:120px"><div class="prog" style="margin-bottom:3px"><div class="pb ${p===100?'pb-g':'pb-b'}" style="width:${p}%"></div></div><div style="font-size:11px;color:var(--text3)">${p}%</div></td><td><span class="badge ba">${c}</span></td><td><div style="display:flex;gap:6px"><button class="btn bxs" onclick="showDetail(${a.id})">Détails</button><button class="btn bxs" onclick="openEditA(${a.id})">✏</button><button class="btn bxs bd" onclick="delA(${a.id})">✕</button></div></td></tr>`}).join(''):'<tr><td colspan="6"><div class="empty"><div class="ei">👥</div><div class="et">Aucun apprenant</div></div></td></tr>';
+}
+function openNewA(){document.getElementById('ea-id').value='';document.getElementById('ma-title').textContent='Nouvel apprenant';['ap','an','ae','aen','aps','ano'].forEach(id=>document.getElementById(id).value='');openM('ma-modal');}
+function openEditA(id){const a=S.apprenants.find(x=>x.id===id);if(!a)return;document.getElementById('ea-id').value=id;document.getElementById('ma-title').textContent='Modifier';document.getElementById('ap').value=a.prenom;document.getElementById('an').value=a.nom;document.getElementById('ae').value=a.email;document.getElementById('aen').value=a.entreprise;document.getElementById('aps').value=a.poste||'';document.getElementById('ano').value=a.notes||'';openM('ma-modal');}
+function saveApprenant(){
+  const p=document.getElementById('ap').value.trim(),n=document.getElementById('an').value.trim();
+  if(!p||!n){notif('Prénom et nom obligatoires','err');return;}
+  const id=document.getElementById('ea-id').value;
+  const d={prenom:p,nom:n,email:document.getElementById('ae').value,entreprise:document.getElementById('aen').value,poste:document.getElementById('aps').value,notes:document.getElementById('ano').value};
+  if(id){Object.assign(S.apprenants.find(x=>x.id===parseInt(id)),d);notif('Mis à jour','ok');}
+  else{d.id=S.ids.a++;S.apprenants.push(d);notif(`${p} ${n} ajouté(e)`,'ok');}
+  saveS();updateBadges();closeM('ma-modal');renderA();
+}
+function delA(id){if(!confirm('Supprimer ?'))return;S.apprenants=S.apprenants.filter(x=>x.id!==id);saveS();updateBadges();renderA();notif('Supprimé');}
+function showDetail(id){
+  const a=S.apprenants.find(x=>x.id===id);if(!a)return;
+  const certs=S.certificats.filter(c=>c.aid===id);
+  const evals=(S.evaluations||[]).filter(e=>e.aid===id);
+  document.getElementById('dd-t').textContent=`${a.prenom} ${a.nom}`;
+  document.getElementById('dd-b').innerHTML=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid var(--gray3)"><div style="width:52px;height:52px;border-radius:50%;background:var(--blue);color:white;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600">${a.prenom[0]}${a.nom[0]}</div><div><div style="font-size:17px;font-weight:600">${a.prenom} ${a.nom}</div><div style="font-size:13px;color:var(--text2)">${a.poste||'—'} · ${a.entreprise}</div><div style="font-size:12px;color:var(--blue);margin-top:2px">${a.email}</div></div></div><div style="font-size:13px;font-weight:600;margin-bottom:8px">Évaluations</div>${evals.length?evals.map(e=>{const f=S.formations.find(x=>x.id===e.fid);return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray3)"><div style="flex:1;font-size:13px">${f?f.title:'Formation supprimée'}</div><span class="badge ${e.passed?'bg':'br'}">${e.score}%</span><span style="font-size:11px;color:var(--text3)">${new Date(e.date).toLocaleDateString('fr-FR')}</span></div>`}).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucune évaluation</div>'}<div style="font-size:13px;font-weight:600;margin:1rem 0 8px">Certificats</div>${certs.length?certs.map(c=>{const f=S.formations.find(x=>x.id===c.fid);return`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray3)"><span style="font-size:16px">🏆</span><div style="flex:1;font-size:13px">${f?f.title:'—'}</div><span class="badge bg">${c.score}%</span><button class="btn bxs" onclick="showCert(${c.id})">Voir</button></div>`}).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px 0">Aucun certificat</div>'}`;
+  document.getElementById('dd-edit').onclick=()=>{closeM('md-modal');openEditA(id);};
+  openM('md-modal');
+}
+
+// LIENS
+function getUrl(token){const base=S.platform.baseUrl||window.location.href.replace('admin.html','stagiaire.html').replace(/#.*/,'');return base+'?token='+token;}
+function renderL(){
+  const now=new Date();
+  document.getElementById('base-url-display').textContent=(S.platform.baseUrl||'votre-domaine.fr/stagiaire.html').replace('https://','');
+  document.getElementById('ll').innerHTML=S.liens.length?S.liens.map(l=>{
+    const f=S.formations.find(x=>x.id===l.fid),a=S.apprenants.find(x=>x.id===l.aid);
+    const exp=new Date(l.expiry)<now,on=l.active&&!exp;
+    const days=Math.ceil((new Date(l.expiry)-now)/86400000);
+    const url=getUrl(l.token);
+    return`<div class="lr"><div class="ldot ${on?'on':'off'}"></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap"><span style="font-size:13px;font-weight:600">${f?f.title:'—'}</span><span style="font-size:13px;color:var(--text2)">→ ${a?a.prenom+' '+a.nom:'—'}</span><span class="badge ${on?'bg':exp?'br':'bgr'}">${on?'Actif':exp?'Expiré':'Inactif'}</span></div><div class="lurl" onclick="copyUrl('${url}')">${url}</div><div style="font-size:11px;color:var(--text3);margin-top:4px">${exp?'Expiré le':'Expire le'} ${new Date(l.expiry).toLocaleDateString('fr-FR')}${on?' ('+days+'j)':''} · ${l.acces===-1?'Illimité':l.used+'/'+l.acces+' accès'}</div></div><div style="display:flex;gap:6px;flex-shrink:0"><button class="btn bxs" onclick="copyUrl('${url}')">📋 Copier</button>${on?`<button class="btn bxs bp" onclick="simAccess(${l.id})">▶</button>`:''}<button class="btn bxs bd" onclick="delL(${l.id})">✕</button></div></div>`;
+  }).join(''):'<div class="empty"><div class="ei">🔗</div><div class="et">Aucun lien généré</div></div>';
+}
+function openNewL(){fillLSelects();document.getElementById('glb').style.display='none';document.getElementById('glbtn').style.display='inline-flex';openM('ml-modal');}
+function openLienForF(fid){openNewL();setTimeout(()=>document.getElementById('lf').value=fid,50);}
+function fillLSelects(){
+  document.getElementById('lf').innerHTML=S.formations.map(f=>`<option value="${f.id}">${f.title}</option>`).join('')||'<option>Aucune formation</option>';
+  document.getElementById('la').innerHTML=S.apprenants.map(a=>`<option value="${a.id}">${a.prenom} ${a.nom}</option>`).join('')||'<option>Aucun apprenant</option>';
+}
+function genLien(){
+  const fid=parseInt(document.getElementById('lf').value),aid=parseInt(document.getElementById('la').value);
+  if(!fid||!aid){notif('Sélectionnez formation et apprenant','err');return;}
+  const duree=parseInt(document.getElementById('ld').value),acces=parseInt(document.getElementById('lac').value);
+  const token='LF-'+Math.random().toString(36).substr(2,8).toUpperCase();
+  S.liens.push({id:S.ids.l++,fid,aid,token,expiry:new Date(Date.now()+duree*86400000).toISOString(),acces,used:0,active:true});
+  saveS();updateBadges();
+  const url=getUrl(token);
+  document.getElementById('glt').textContent=url;
+  document.getElementById('glb').style.display='block';
+  document.getElementById('glbtn').style.display='none';
+  notif('Lien généré !','ok');
+  if(curPage==='liens')renderL();
+}
+function copyGL(){copyUrl(document.getElementById('glt').textContent);}
+function copyUrl(url){navigator.clipboard.writeText(url).then(()=>notif('Lien copié !','ok')).catch(()=>{notif('URL : '+url)});}
+function simAccess(id){const l=S.liens.find(x=>x.id===id);if(l){l.used++;saveS();startQ(l.fid,l.aid);}}
+function delL(id){if(!confirm('Supprimer ce lien ?'))return;S.liens=S.liens.filter(x=>x.id!==id);saveS();updateBadges();renderL();notif('Supprimé');}
+
+// CERTIFICATS
+function renderC(){
+  document.getElementById('sd').textContent=S.platform.seuil||70;
+  document.getElementById('cg').innerHTML=S.certificats.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem">`+S.certificats.map(c=>{const a=S.apprenants.find(x=>x.id===c.aid),f=S.formations.find(x=>x.id===c.fid),m=c.score>=90?'Très bien':c.score>=80?'Bien':'Passable';return`<div class="card" style="cursor:pointer;transition:box-shadow .2s" onmouseover="this.style.boxShadow='var(--shl)'" onmouseout="this.style.boxShadow='var(--sh)'" onclick="showCert(${c.id})"><div style="text-align:center;padding:.5rem 0 .75rem"><div style="font-size:28px;margin-bottom:10px">🏆</div><div style="font-size:14px;font-weight:600;margin-bottom:3px">${a?a.prenom+' '+a.nom:'—'}</div><div style="font-size:11px;color:var(--text2);margin-bottom:8px">${a?a.entreprise:''}</div><div style="font-size:13px;color:var(--blue);font-weight:500;margin-bottom:10px">${f?f.title:'—'}</div><span style="background:var(--green);color:white;font-size:12px;font-weight:600;padding:4px 14px;border-radius:99px">${c.score}% · ${m}</span><div style="font-size:11px;color:var(--text3);margin-top:10px">${new Date(c.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</div></div></div>`}).join('')+'</div>'
+  :'<div class="empty"><div class="ei">🏆</div><div class="et">Aucun certificat émis</div><div>Générés automatiquement à ≥ '+(S.platform.seuil||70)+'%</div></div>';
+}
+function showCert(certId){
+  const c=S.certificats.find(x=>x.id===certId);if(!c)return;
+  const a=S.apprenants.find(x=>x.id===c.aid),f=S.formations.find(x=>x.id===c.fid);
+  const m=c.score>=90?'Très bien':c.score>=80?'Bien':'Passable';
+  document.getElementById('cp').innerHTML=`<div class="cert"><div style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:white;font-size:11px;font-weight:600;padding:4px 14px;border-radius:99px;margin-bottom:1rem">🎓 ${S.platform.nom||'LearnFlow Academy'}</div><div style="font-size:12px;color:var(--blue);margin-bottom:8px;font-weight:500">certifie que</div><div style="font-size:24px;font-weight:600;color:var(--blue-d);margin-bottom:4px">${a?a.prenom+' '+a.nom:'—'}</div><div style="font-size:12px;color:var(--text2);margin-bottom:12px">${a?a.poste||a.entreprise:''}</div><div style="font-size:13px;color:var(--blue);margin-bottom:6px">a suivi et réussi la formation</div><div style="font-size:15px;color:var(--blue);font-weight:500;margin-bottom:10px">${f?f.title:'—'}</div><span style="background:var(--green);color:white;font-size:14px;font-weight:600;padding:6px 20px;border-radius:99px;display:inline-block;margin-bottom:12px">${c.score}% · Mention ${m}</span><div style="font-size:12px;color:var(--text2)">Délivré le ${new Date(c.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}</div><div style="font-size:11px;color:var(--text3);margin-top:8px;font-weight:500;letter-spacing:.5px">${S.platform.org||''}</div><div class="cert-seal">✓</div></div>`;
+  openM('mc-modal');
+}
+
+// EVALUATIONS
+function renderE(){
+  const evals=S.evaluations||[];
+  document.getElementById('etb').innerHTML=evals.length?evals.map(e=>{const a=S.apprenants.find(x=>x.id===e.aid),f=S.formations.find(x=>x.id===e.fid),cert=S.certificats.find(c=>c.aid===e.aid&&c.fid===e.fid);return`<tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avatar" style="width:26px;height:26px;font-size:10px">${a?a.prenom[0]+a.nom[0]:'?'}</div>${a?a.prenom+' '+a.nom:'Supprimé'}</div></td><td style="font-size:12px">${f?f.title:'Supprimée'}</td><td><span style="font-weight:600">${e.score}%</span></td><td><span class="badge ${e.passed?'bg':'br'}">${e.passed?'Réussi':'Échoué'}</span></td><td style="font-size:12px;color:var(--text2)">${new Date(e.date).toLocaleDateString('fr-FR')}</td><td>${cert?`<button class="btn bxs" onclick="showCert(${cert.id})">🏆 Voir</button>`:'<span style="font-size:12px;color:var(--text3)">—</span>'}</td></tr>`}).join(''):'<tr><td colspan="6"><div class="empty"><div class="ei">📊</div><div class="et">Aucune évaluation</div></div></td></tr>';
+}
+
+// QUIZ
+let qCtx={};
+function previewQ(fid){startQ(fid,null);}
+function startQ(fid,aid){qCtx={fid,aid,cur:0,ans:[],done:false};renderQ();openM('mq-modal');}
+function renderQ(){
+  const f=S.formations.find(x=>x.id===qCtx.fid);if(!f||!f.questions.length)return;
+  const q=f.questions[qCtx.cur],total=f.questions.length;
+  document.getElementById('qt').textContent='Évaluation · '+f.title;
+  document.getElementById('qc').textContent=(qCtx.cur+1)+'/'+total;
+  document.getElementById('qpb').style.width=Math.round((qCtx.cur/total)*100)+'%';
+  document.getElementById('qnbtn').textContent=qCtx.cur<total-1?'Suivant →':'Terminer ✓';
+  document.getElementById('qnbtn').style.display='inline-flex';
+  document.getElementById('qcbtn').textContent='Annuler';
+  document.getElementById('qbody').innerHTML=`<div style="font-size:14px;font-weight:600;margin-bottom:14px;line-height:1.4">${qCtx.cur+1}. ${q.q}</div>`+q.opts.map((o,i)=>`<div class="qopt ${qCtx.ans[qCtx.cur]===i?'sel':''}" onclick="selOpt(${i})">${String.fromCharCode(65+i)}. ${o}</div>`).join('');
+}
+function selOpt(i){qCtx.ans[qCtx.cur]=i;renderQ();}
+function qNext(){
+  if(qCtx.ans[qCtx.cur]===undefined){notif('Choisissez une réponse','err');return;}
+  const f=S.formations.find(x=>x.id===qCtx.fid);
+  if(qCtx.cur<f.questions.length-1){qCtx.cur++;renderQ();}else submitQ();
+}
+function submitQ(){
+  const f=S.formations.find(x=>x.id===qCtx.fid);
+  let ok=0;f.questions.forEach((q,i)=>{if(qCtx.ans[i]===q.answer)ok++;});
+  const score=Math.round((ok/f.questions.length)*100),passed=score>=(S.platform.seuil||70);
+  document.getElementById('qpb').style.width='100%';
+  document.getElementById('qc').textContent='Terminé';
+  document.getElementById('qnbtn').style.display='none';
+  document.getElementById('qcbtn').textContent='Fermer';
+  document.getElementById('qbody').innerHTML=`<div class="alert ${passed?'al-s':'al-d'}" style="text-align:center;padding:1.5rem;margin-bottom:1rem"><div style="font-size:32px;margin-bottom:8px">${passed?'🏆':'😞'}</div><div style="font-size:22px;font-weight:700;margin-bottom:6px">${score}%</div><div style="font-size:14px;font-weight:500">${passed?'Félicitations ! Réussi':'Score insuffisant'}</div><div style="font-size:12px;margin-top:4px">${ok}/${f.questions.length} bonnes réponses · Seuil : ${S.platform.seuil||70}%</div>${passed&&qCtx.aid?'<div style="font-size:12px;margin-top:6px;font-weight:500">✅ Certificat généré</div>':''}</div>`+f.questions.map((q,i)=>`<div style="margin-bottom:10px"><div style="font-size:13px;font-weight:500;margin-bottom:6px">${i+1}. ${q.q}</div>${q.opts.map((o,j)=>`<div class="qopt ${j===q.answer?'ok':j===qCtx.ans[i]&&j!==q.answer?'ko':''}" style="cursor:default;padding:6px 12px">${String.fromCharCode(65+j)}. ${o}${j===q.answer?' ✓':''}</div>`).join('')}</div>`).join('');
+  if(qCtx.aid){
+    if(!S.evaluations)S.evaluations=[];
+    S.evaluations.push({id:S.ids.e++,aid:qCtx.aid,fid:qCtx.fid,score,passed,date:new Date().toISOString()});
+    if(passed){const already=S.certificats.find(c=>c.aid===qCtx.aid&&c.fid===qCtx.fid);if(!already)S.certificats.push({id:S.ids.c++,aid:qCtx.aid,fid:qCtx.fid,score,date:new Date().toISOString()});}
+    S.progressions[qCtx.aid+'-'+qCtx.fid]=100;
+    saveS();updateBadges();
+  }
+}
+
+// PARAMÈTRES
+function loadParams(){
+  document.getElementById('pu').value=getCreds().user;
+  document.getElementById('pn').value=S.platform.nom||'LearnFlow Academy';
+  document.getElementById('po').value=S.platform.org||'';
+  document.getElementById('ps').value=S.platform.seuil||70;
+  document.getElementById('purl').value=S.platform.baseUrl||'';
+}
+function saveCreds(){
+  const u=document.getElementById('pu').value.trim(),p=document.getElementById('pp').value,p2=document.getElementById('pp2').value;
+  if(!u){notif('Identifiant obligatoire','err');return;}
+  if(p&&p!==p2){notif('Mots de passe différents','err');return;}
+  const cur=getCreds();setCreds({user:u,pass:p||cur.pass});
+  document.getElementById('pp').value='';document.getElementById('pp2').value='';
+  document.getElementById('sav').textContent=u.slice(0,2).toUpperCase();
+  document.getElementById('sun').textContent=u;
+  notif('Identifiants mis à jour','ok');
+}
+function saveBaseUrl(){
+  S.platform.baseUrl=document.getElementById('purl').value.trim();
+  saveS();notif('URL stagiaire enregistrée','ok');
+  document.getElementById('base-url-display').textContent=(S.platform.baseUrl||'votre-domaine.fr/stagiaire.html').replace('https://','');
+}
+function savePlatform(){
+  const s=parseInt(document.getElementById('ps').value);
+  if(isNaN(s)||s<1||s>100){notif('Seuil invalide (1-100)','err');return;}
+  S.platform.nom=document.getElementById('pn').value.trim()||'LearnFlow Academy';
+  S.platform.org=document.getElementById('po').value.trim();
+  S.platform.seuil=s;
+  saveS();notif('Paramètres enregistrés','ok');
+}
+function exportJSON(){const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='learnflow_'+new Date().toISOString().slice(0,10)+'.json';a.click();notif('Export JSON téléchargé','ok');}
+function exportCSV(){
+  const rows=[['Prénom','Nom','Email','Entreprise','Poste','Progression%','Certificats']];
+  S.apprenants.forEach(a=>{const p=getProg(a.id),c=S.certificats.filter(x=>x.aid===a.id).length;rows.push([a.prenom,a.nom,a.email,a.entreprise,a.poste||'',p,c]);});
+  const csv=rows.map(r=>r.map(x=>'"'+String(x||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  const b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='apprenants_'+new Date().toISOString().slice(0,10)+'.csv';a.click();notif('CSV téléchargé','ok');
+}
+function resetData(){S=defState();saveS();updateBadges();renderPage(curPage);notif('Réinitialisé');}
+
+// UTILS
+function getProg(aid){const k=Object.entries(S.progressions||{}).filter(([k])=>k.startsWith(aid+'-'));if(!k.length)return 0;return Math.round(k.reduce((s,[,v])=>s+v,0)/k.length);}
+function openM(id){document.getElementById(id).classList.remove('hidden');}
+function closeM(id){document.getElementById(id).classList.add('hidden');}
+function notif(msg,type=''){const n=document.getElementById('notif');n.textContent=msg;n.className='notif'+(type?' '+type:'');n.classList.add('show');clearTimeout(n._t);n._t=setTimeout(()=>n.classList.remove('show'),3200);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id);}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.mo:not(.hidden)').forEach(m=>closeM(m.id));});
+document.getElementById('lu').focus();
+</script>
+</body>
+</html>
