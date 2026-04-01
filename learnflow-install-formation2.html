@@ -49,7 +49,7 @@
   <div class="modules-list">
     <div style="font-size:12px;font-weight:600;color:#9a9690;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">État des modules</div>
     <div class="mod-item"><div class="mod-icon m-ready">✓</div><div><strong>Module 1</strong> — Cadre réglementaire <span style="color:#1D9E75;font-size:11px">(prêt)</span></div></div>
-    <div class="mod-item"><div class="mod-icon m-wait">2</div><div style="color:#9a9690">Module 2 — En attente de votre document</div></div>
+    <div class="mod-item"><div class="mod-icon m-ready">✓</div><div><strong>Module 2</strong> — Les titres d'habilitation <span style="color:#1D9E75;font-size:11px">(prêt)</span></div></div>
     <div class="mod-item"><div class="mod-icon m-wait">3</div><div style="color:#9a9690">Module 3 — En attente de votre document</div></div>
     <div class="mod-item"><div class="mod-icon m-wait">4</div><div style="color:#9a9690">Module 4 — En attente de votre document</div></div>
     <div class="mod-item"><div class="mod-icon m-wait">5</div><div style="color:#9a9690">Module 5 — En attente de votre document</div></div>
@@ -147,7 +147,66 @@ const FORMATION = {
         }
       ]
     }
-    // Modules 2 à 7 seront ajoutés au fur et à mesure
+    // Module 2
+    {
+      id: 2,
+      titre: "Les titres d'habilitation",
+      parties: [
+        {
+          titre: "Définition et objectifs de l'habilitation",
+          contenu: "L'habilitation est la reconnaissance par l'employeur, de la capacité d'une personne placée sous son autorité à accomplir en sécurité vis-à-vis du risque électrique les tâches qui lui sont confiées.\n\nL'habilitation a pour objectifs :\n• La sauvegarde des personnes et des biens\n• La compétence des intervenants en matière de sécurité électrique\n\nL'habilitation est obligatoire pour :\n• Effectuer toutes opérations sur des ouvrages ou des installations électriques ou dans leur voisinage\n• Surveiller les opérations sur des ouvrages ou des installations électriques\n• Accéder sans surveillance aux locaux et emplacements d'accès réservé aux électriciens",
+          questions: [
+            {q:"Qu'est-ce que l'habilitation électrique ?",opts:["Un diplôme délivré par l'État","La reconnaissance par l'employeur de la capacité à accomplir des tâches en sécurité électrique","Une simple formation de sensibilisation","Un document délivré par la CRAM"],answer:1},
+            {q:"L'habilitation est-elle obligatoire pour accéder sans surveillance aux locaux réservés aux électriciens ?",opts:["Non, tout le monde peut y accéder","Oui, l'habilitation est obligatoire","Seulement pour les électriciens","Seulement en haute tension"],answer:1},
+            {q:"Quels sont les objectifs de l'habilitation ?",opts:["Uniquement la compétence technique","La sauvegarde des personnes et des biens, et la compétence en sécurité électrique","Uniquement la sauvegarde des biens","La certification professionnelle"],answer:1}
+          ]
+        },
+        {
+          titre: "Les habilitations en Basse Tension (BT)",
+          contenu: "<div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1rem'><thead><tr style='background:#185FA5;color:white'><th style='padding:8px 12px;text-align:left'>Symbole</th><th style='padding:8px 12px;text-align:left'>Type d'opération</th><th style='padding:8px 12px;text-align:left'>Type de travaux</th></tr></thead><tbody><tr style='background:#f8f7f5'><td style='padding:8px 12px;font-weight:600'>B0</td><td style='padding:8px 12px'>Non électrique</td><td style='padding:8px 12px'>Travaux d'ordre non électrique</td></tr><tr><td style='padding:8px 12px;font-weight:600'>B1</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Électricien exécutant</td></tr><tr style='background:#f8f7f5'><td style='padding:8px 12px;font-weight:600'>B2</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Chargé de travaux</td></tr><tr><td style='padding:8px 12px;font-weight:600'>BR</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Chargé d'intervention générale</td></tr><tr style='background:#f8f7f5'><td style='padding:8px 12px;font-weight:600'>BS</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Chargé d'intervention élémentaire</td></tr><tr><td style='padding:8px 12px;font-weight:600'>BC</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Chargé de consignation</td></tr><tr style='background:#f8f7f5'><td style='padding:8px 12px;font-weight:600'>BE</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Chargé d'essai, mesurage, manœuvre</td></tr><tr><td style='padding:8px 12px;font-weight:600'>BP</td><td style='padding:8px 12px'>BT</td><td style='padding:8px 12px'>Intervenant sur panneaux photovoltaïques</td></tr></tbody></table></div>\n\nSymboles complémentaires :\n<div style='display:flex;flex-direction:column;gap:8px;margin-top:8px'><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:8px 12px;border-radius:0 8px 8px 0'><strong>V</strong> — Travail au voisinage de pièces nues sous tension (sauf pour le B0)</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:8px 12px;border-radius:0 8px 8px 0'><strong>T</strong> — Travail sous tension (TST)</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:8px 12px;border-radius:0 8px 8px 0'><strong>N</strong> — Travaux de Nettoyage Sous Tension (NST)</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:8px 12px;border-radius:0 8px 8px 0'><strong>X</strong> — Opérations spéciales définies par une instruction de sécurité</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:8px 12px;border-radius:0 8px 8px 0'><strong>L</strong> — Véhicule électrique</div></div>",
+          questions: [
+            {q:"Quelle habilitation BT correspond au 'Chargé d'intervention générale' ?",opts:["BS","BC","BR","BE"],answer:2},
+            {q:"Que signifie le symbole complémentaire 'V' dans une habilitation ?",opts:["Travail sous tension","Travail au voisinage de pièces nues sous tension","Véhicule électrique","Vérification d'absence de tension"],answer:1},
+            {q:"Quelle habilitation BT est réservée aux interventions élémentaires simples ?",opts:["B1","B2","BR","BS"],answer:3}
+          ]
+        },
+        {
+          titre: "Les habilitations en Haute Tension (HT) et rôles",
+          contenu: "<div style='overflow-x:auto'><table style='width:100%;border-collapse:collapse;font-size:13px;margin-bottom:1rem'><thead><tr style='background:#A32D2D;color:white'><th style='padding:8px 12px;text-align:left'>Symbole</th><th style='padding:8px 12px;text-align:left'>Type d'opération</th><th style='padding:8px 12px;text-align:left'>Type de travaux</th></tr></thead><tbody><tr style='background:#fff5f5'><td style='padding:8px 12px;font-weight:600'>H0</td><td style='padding:8px 12px'>Non électrique</td><td style='padding:8px 12px'>Travaux d'ordre non électrique</td></tr><tr><td style='padding:8px 12px;font-weight:600'>H1</td><td style='padding:8px 12px'>HT</td><td style='padding:8px 12px'>Électricien exécutant</td></tr><tr style='background:#fff5f5'><td style='padding:8px 12px;font-weight:600'>H2</td><td style='padding:8px 12px'>HT</td><td style='padding:8px 12px'>Chargé de travaux</td></tr><tr><td style='padding:8px 12px;font-weight:600'>HC</td><td style='padding:8px 12px'>HT</td><td style='padding:8px 12px'>Chargé de consignation</td></tr><tr style='background:#fff5f5'><td style='padding:8px 12px;font-weight:600'>HE</td><td style='padding:8px 12px'>HT</td><td style='padding:8px 12px'>Chargé d'essai, mesurage, manœuvre</td></tr><tr><td style='padding:8px 12px;font-weight:600'>HP</td><td style='padding:8px 12px'>HT</td><td style='padding:8px 12px'>Intervenant sur panneaux photovoltaïques</td></tr></tbody></table></div>\n\nRôles clés :\n<div style='display:flex;flex-direction:column;gap:8px;margin-top:8px'><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>Chef d'entreprise</strong> — Délivre les titres d'habilitation, s'assure de la qualification du personnel, remet le carnet de prescriptions</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>Donneur d'ordre</strong> — Décide du niveau d'habilitation requis, autorise l'accès aux installations, vérifie les habilitations</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>Exécutant B1/H1</strong> — Travaille sous la conduite d'un chargé de travaux, respecte les instructions, ne revient pas sur la zone sans autorisation</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>Chargé de consignation BC/HC</strong> — Réalise les opérations de consignation, met hors tension, remet l'attestation de consignation</div></div>",
+          questions: [
+            {q:"Qui délivre le titre d'habilitation ?",opts:["L'inspection du travail","L'organisme de formation","L'employeur / chef d'entreprise","La CNAM"],answer:2},
+            {q:"Que remet le chargé de consignation après ses opérations ?",opts:["Un ordre de travail","L'attestation de consignation","Un bon d'intervention","Le carnet de prescriptions"],answer:1},
+            {q:"L'exécutant B1 peut-il revenir sur la zone de travail sans autorisation à la fin des travaux ?",opts:["Oui, il peut y retourner librement","Oui, s'il a terminé sa tâche","Non, il ne doit pas revenir sans autorisation","Oui, pour vérifier son travail"],answer:2}
+          ]
+        },
+        {
+          titre: "Chargé d'intervention BR, BS et opérations spécifiques",
+          contenu: "<div style='display:flex;flex-direction:column;gap:12px'><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:14px;border-radius:0 8px 8px 0'><strong>Chargé d'intervention général BR</strong><br>Intervient sur circuits avec protection maxi 63A~ et 32A=. Ses 3 étapes de dépannage :<br>1. Recherche et localisation du défaut (sous tension) → consignation<br>2. Élimination du défaut (hors tension) → déconsignation<br>3. Réglage, vérification et mise en service (sous tension)</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:14px;border-radius:0 8px 8px 0'><strong>Chargé d'intervention élémentaire BS</strong><br>Intervention BT simple sur circuits terminaux hors tension. Tension U ≤ 400V~ et U ≤ 600V=. Protection maxi 32A~ et 16A=.<br>Avant d'opérer : Pré-identification → Séparation → Condamnation → VAT (avec gants isolants).<br>Intervention interdite en zone 4 (Z4 = zone de voisinage renforcé)</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:14px;border-radius:0 8px 8px 0'><strong>Chargé d'opérations spécifiques BE/HE</strong><br>• BE/HE Essai — vérifie qu'une installation fonctionne selon les spécifications<br>• BE/HE Mesurage — mesures électriques sur installations (tension, intensité, résistance...)<br>• BE/HE Manœuvre — changement de configuration électrique d'un réseau</div><div style='background:#EAF3DE;border-left:3px solid #1D9E75;padding:14px;border-radius:0 8px 8px 0'><strong>⚠️ Habilitations accessibles aux non-électriciens :</strong><br>Seuls les titres <strong>H0, H0V, B0, BS et BE manœuvre</strong> sont accessibles à des personnes non électriciennes.</div></div>",
+          questions: [
+            {q:"Quelle est la protection maximale pour une intervention BR ?",opts:["32A~ et 16A=","63A~ et 32A=","100A~ et 63A=","16A~ et 10A="],answer:1},
+            {q:"Avant d'opérer, le BS doit effectuer dans l'ordre :",opts:["VAT puis condamnation puis séparation","Séparation puis condamnation puis VAT","Pré-identification, séparation, condamnation et VAT","Consignation puis déconsignation puis VAT"],answer:2},
+            {q:"Quels titres d'habilitation sont accessibles aux personnes non électriciennes ?",opts:["B1, B2, BR","H0, H0V, B0, BS et BE manœuvre","Tous les titres BT","BC, HC uniquement"],answer:1}
+          ]
+        },
+        {
+          titre: "✏️ Évaluation finale — Module 2",
+          contenu: "Vous avez terminé le Module 2 — Les titres d'habilitation.\n\nCette évaluation finale porte sur l'ensemble des notions abordées :\n• Définition et objectifs de l'habilitation\n• Les habilitations BT et leurs symboles\n• Les habilitations HT et les rôles\n• Les interventions BR, BS et opérations spécifiques\n\nObtenez au moins 70% pour valider ce module.",
+          questions: [
+            {q:"Qu'est-ce que l'habilitation électrique ?",opts:["Un diplôme d'État","La reconnaissance par l'employeur de la capacité à travailler en sécurité électrique","Une simple formation","Un document CRAM"],answer:1},
+            {q:"Quelle habilitation BT correspond au 'Chargé de travaux' ?",opts:["B1","B2","BR","BC"],answer:1},
+            {q:"Quelle habilitation BT correspond au 'Chargé d'intervention générale' ?",opts:["BS","BC","BR","BE"],answer:2},
+            {q:"Que signifie le symbole complémentaire 'V' ?",opts:["Travail sous tension","Travail au voisinage de pièces nues sous tension","Véhicule électrique","Vérification"],answer:1},
+            {q:"Qui délivre le titre d'habilitation ?",opts:["L'inspection du travail","L'organisme de formation","L'employeur","La CNAM"],answer:2},
+            {q:"Quelle est la protection maximale pour une intervention BR ?",opts:["32A~ et 16A=","63A~ et 32A=","100A~ et 63A=","16A~ et 10A="],answer:1},
+            {q:"Le BS peut-il intervenir en zone de voisinage renforcé (Z4) ?",opts:["Oui sans restriction","Oui avec des EPI","Non, c'est interdit","Seulement avec autorisation"],answer:2},
+            {q:"Quels titres sont accessibles aux non-électriciens ?",opts:["B1, B2, BR","H0, H0V, B0, BS et BE manœuvre","Tous les titres BT","BC, HC uniquement"],answer:1},
+            {q:"Le chargé de consignation BC remet après ses opérations :",opts:["Un ordre de travail","L'attestation de consignation","Le carnet de prescriptions","Un bon d'intervention"],answer:1},
+            {q:"Combien d'étapes comporte le dépannage par un BR ?",opts:["1 étape","2 étapes","3 étapes","4 étapes"],answer:2}
+          ]
+        }
+      ]
+    },
+    // Modules 3 à 7 seront ajoutés au fur et à mesure
   ]
 };
 
@@ -208,7 +267,7 @@ async function installer(isUpdate){
     await new Promise(r=>setTimeout(r,400));
     step(4,'o','Installation réussie ✓');
 
-    status(`🎉 <strong>${found?'Mise à jour':'Installation'} réussie !</strong><br><br>Module 1 — Cadre réglementaire :<br>✅ 4 parties de cours (3 questions chacune)<br>✅ 1 évaluation finale (10 questions)<br><br>Envoyez-moi le <strong>Module 2</strong> pour continuer !<br><br><a href="https://fbformations21-elearning.github.io/formation/learnflow-admin.html" style="color:#185FA5;font-weight:600">→ Ouvrir le portail admin</a>`,'ok');
+    status(`🎉 <strong>${found?'Mise à jour':'Installation'} réussie !</strong><br><br>✅ Module 1 — Cadre réglementaire (4 parties + évaluation finale)<br>✅ Module 2 — Les titres d'habilitation (4 parties + évaluation finale)<br><br>Envoyez-moi le <strong>Module 2</strong> pour continuer !<br><br><a href="https://fbformations21-elearning.github.io/formation/learnflow-admin.html" style="color:#185FA5;font-weight:600">→ Ouvrir le portail admin</a>`,'ok');
 
     btn1.style.display='none';
     btn2.style.display='block';
