@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearnFlow — Installation Formation Réglementaire</title>
+<style>
+  body{font-family:sans-serif;background:#f0f4f8;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:1rem;}
+  .box{background:white;border-radius:16px;padding:2.5rem;max-width:560px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+  .logo{font-size:22px;font-weight:700;color:#185FA5;margin-bottom:4px;}
+  .logo span{color:#1D9E75;}
+  .sub{font-size:13px;color:#6b6860;margin-bottom:1.5rem;}
+  .info{background:#E6F1FB;color:#0C447C;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:1.5rem;line-height:1.6;}
+  .modules-list{margin-bottom:1.5rem;}
+  .mod-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:6px;background:#f8f7f5;}
+  .mod-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+  .m-ready{background:#EAF3DE;color:#1D9E75;}
+  .m-wait{background:#f0ede8;color:#9a9690;}
+  .btn{width:100%;padding:14px;background:#185FA5;color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;margin-bottom:8px;}
+  .btn:hover{background:#0C447C;}
+  .btn:disabled{background:#9a9690;cursor:not-allowed;}
+  .btn-update{background:#1D9E75;}
+  .btn-update:hover{background:#0F6E56;}
+  .status{margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:13px;display:none;line-height:1.6;}
+  .ok{background:#EAF3DE;color:#0F6E56;}
+  .err{background:#FCEBEB;color:#A32D2D;}
+  .steps{margin:1.25rem 0;display:none;}
+  .step{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0ede8;font-size:13px;}
+  .step:last-child{border:none;}
+  .si{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;}
+  .s-w{background:#f0ede8;color:#9a9690;}
+  .s-l{background:#E6F1FB;color:#185FA5;}
+  .s-o{background:#EAF3DE;color:#1D9E75;}
+  .s-e{background:#FCEBEB;color:#E24B4A;}
+  .warning{background:#FAEEDA;color:#854F0B;border-radius:10px;padding:10px 14px;font-size:12px;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">Learn<span>Flow</span></div>
+  <div class="sub">Gestionnaire de formations — Installation</div>
+
+  <div class="info">
+    📚 <strong>Formation : Parcours Réglementaire</strong><br>
+    7 modules · Public : Tous salariés · Catégorie : Réglementaire<br>
+    Seuil de réussite : 70% · 10 questions par module
+  </div>
+
+  <div class="modules-list">
+    <div style="font-size:12px;font-weight:600;color:#9a9690;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">État des modules</div>
+    <div class="mod-item"><div class="mod-icon m-ready">✓</div><div><strong>Module 1</strong> — Cadre réglementaire <span style="color:#1D9E75;font-size:11px">(prêt)</span></div></div>
+    <div class="mod-item"><div class="mod-icon m-wait">2</div><div style="color:#9a9690">Module 2 — En attente de votre document</div></div>
+    <div class="mod-item"><div class="mod-icon m-wait">3</div><div style="color:#9a9690">Module 3 — En attente de votre document</div></div>
+    <div class="mod-item"><div class="mod-icon m-wait">4</div><div style="color:#9a9690">Module 4 — En attente de votre document</div></div>
+    <div class="mod-item"><div class="mod-icon m-wait">5</div><div style="color:#9a9690">Module 5 — En attente de votre document</div></div>
+    <div class="mod-item"><div class="mod-icon m-wait">6</div><div style="color:#9a9690">Module 6 — En attente de votre document</div></div>
+    <div class="mod-item"><div class="mod-icon m-wait">7</div><div style="color:#9a9690">Module 7 — En attente de votre document</div></div>
+  </div>
+
+  <div class="warning">⚠️ Si la formation existe déjà dans Supabase, cliquez sur "Mettre à jour" pour ajouter les nouveaux modules sans perdre les données existantes.</div>
+
+  <button class="btn" id="btn-install" onclick="installer(false)">🚀 Installer la formation (Module 1)</button>
+  <button class="btn btn-update" id="btn-update" onclick="installer(true)" style="display:none">🔄 Mettre à jour avec les nouveaux modules</button>
+
+  <div class="steps" id="steps">
+    <div class="step"><div class="si s-w" id="i1">1</div><div id="t1">Connexion à Supabase</div></div>
+    <div class="step"><div class="si s-w" id="i2">2</div><div id="t2">Vérification formation existante</div></div>
+    <div class="step"><div class="si s-w" id="i3">3</div><div id="t3">Insertion / mise à jour</div></div>
+    <div class="step"><div class="si s-w" id="i4">4</div><div id="t4">Vérification finale</div></div>
+  </div>
+  <div class="status" id="status"></div>
+</div>
+
+<script>
+const SUPA_URL='https://oebnvaxvmrmyvuiuuzwh.supabase.co';
+const SUPA_KEY='sb_publishable__oCF5Szn4auhOaUscwtplQ_JYOt-cJ8';
+
+async function supa(method,table,body=null,filter=''){
+  const res=await fetch(`${SUPA_URL}/rest/v1/${table}${filter}`,{
+    method,
+    headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):null
+  });
+  if(!res.ok){const e=await res.text();throw new Error(e);}
+  if(res.status===204)return null;
+  return res.json();
+}
+
+function step(n,state,text){
+  const icons={w:'s-w',l:'s-l',o:'s-o',e:'s-e'};
+  const labels={w:n,l:'⟳',o:'✓',e:'✗'};
+  document.getElementById('i'+n).className='si '+icons[state];
+  document.getElementById('i'+n).textContent=labels[state];
+  if(text)document.getElementById('t'+n).textContent=text;
+}
+function status(msg,type){
+  const s=document.getElementById('status');
+  s.style.display='block';s.className='status '+type;s.innerHTML=msg;
+}
+
+const FORMATION = {
+  title: "Parcours Réglementaire — Habilitation Électrique",
+  desc: "Formation complète sur le cadre réglementaire, la prévention des risques et les obligations légales — 7 modules",
+  duree: "7h00",
+  cat: "Réglementaire",
+  niveau: "Tous niveaux",
+  modules: [
+    {
+      id: 1,
+      titre: "Cadre réglementaire",
+      parties: [
+        {
+          titre: "Obligations du chef d'établissement",
+          contenu: "L'employeur définit et met en œuvre les mesures de prévention de façon à supprimer ou réduire le risque d'origine électrique lors des opérations sur les installations électriques ou dans leur voisinage.\n\nSelon l'article R4544-4, l'employeur s'assure que :\n1 - Les travaux sont effectués hors tension, sauf si l'évaluation des risques montre que la mise hors tension est dangereuse ou techniquement impossible.\n2 - Les opérations au voisinage de pièces nues sous tension sont limitées aux cas où il n'a pas été possible de supprimer ce voisinage.\n3 - Les opérations d'ordre non électrique dans le voisinage de pièces nues sous tension sont limitées aux seules opérations qui concourent à l'exploitation et à la maintenance.\n\nPour en savoir plus : <a href='https://www.service-public.gouv.fr/particuliers/vosdroits/F2210' target='_blank'>Responsabilité de l'employeur</a> | <a href='https://youtu.be/4gk4uEKskS8?si=OZyEHo5nOkApGNwD' target='_blank'>Responsabilité pénale (vidéo)</a>",
+          questions: [
+            {q:"Quel décret définit les obligations de l'employeur concernant les risques électriques ?",opts:["Décret n°2008-244 du 7 mars 2008","Décret n°2010-1118 du 22 septembre 2010","Décret n°2015-799 du 1er juillet 2015","Décret n°2012-523 du 20 avril 2012"],answer:1},
+            {q:"Selon l'article R4544-4, dans quel cas les travaux peuvent-ils être effectués sous tension ?",opts:["Jamais, c'est toujours interdit","Si la mise hors tension est dangereuse ou techniquement impossible","Uniquement si l'employeur le demande","Toujours, car c'est plus rapide"],answer:1},
+            {q:"Que doit faire l'employeur selon l'article R4321-4 concernant les EPI ?",opts:["Les acheter et les stocker","Les mettre à disposition et veiller à leur utilisation effective","Les fournir uniquement aux nouveaux","Les remplacer une fois par an"],answer:1}
+          ]
+        },
+        {
+          titre: "Normes et habilitation électrique",
+          contenu: "L'exploitant a pour obligation la sécurité des ouvrages. À ce titre, il doit se conformer aux règles et normes de construction :\n\n• NF C15-100 : installations électriques en Basse Tension (BT)\n• NF C13-100 : installations HT (livraison)\n• NF C13-200 : installations HT (distribution)\n\nL'employeur a pour obligation la sécurité des opérations. À ce titre, il doit se conformer au Code du travail et à la norme NF C18-510 et habiliter le personnel dans le cadre professionnel.\n\nL'habilitation pour un prestataire de service est :\n- Une demande des clients dans le cadre du cahier des charges du site\n- Une obligation pour exercer en tant que SSIAP (arrêté du 02 mai 2005) : HoBo, Ho BS ou BE manœuvre",
+          questions: [
+            {q:"Quelle norme régit les installations électriques en Basse Tension (BT) ?",opts:["NF C13-100","NF C13-200","NF C15-100","NF C18-510"],answer:2},
+            {q:"Quelle norme encadre les habilitations électriques du personnel ?",opts:["NF C15-100","NF C13-100","NF C18-510","NF C13-200"],answer:2},
+            {q:"L'habilitation électrique est obligatoire pour les agents SSIAP selon :",opts:["Le Code de la construction","L'arrêté du 02 mai 2005","La norme NF C15-100","Le décret de 2010"],answer:1}
+          ]
+        },
+        {
+          titre: "Les 9 principes généraux de prévention",
+          contenu: "Les neuf principes généraux régissent l'organisation de la démarche de prévention des risques professionnels (article <a href='http://www.legifrance.gouv.fr/affichCodeArticle.do?idArticle=LEGIARTI000006903148&cidTexte=LEGITEXT000006072050' target='_blank'>L4121-2 du Code du travail</a>). Ils sont transposables à toutes les situations de travail.\n\n<div style='display:flex;flex-direction:column;gap:10px;margin-top:8px'><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>1.</strong> <a href='https://www.youtube.com/watch?v=XkedOwcEWp4' target='_blank'>Éviter les risques</a> — supprimer le danger ou l'exposition au danger</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>2.</strong> <a href='https://www.youtube.com/watch?v=DHs4-lHKLrQ' target='_blank'>Évaluer les risques</a> — identifier la nature des dangers n'ayant pu être supprimés</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>3.</strong> <a href='https://www.youtube.com/watch?v=snEYOm8hxyI' target='_blank'>Combattre les risques à la source</a> — intégrer la prévention dès la conception des lieux, équipements ou modes opératoires</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>4.</strong> <a href='https://www.youtube.com/watch?v=9JSsgoQIIuE' target='_blank'>Adapter le travail à l'homme</a> — réduire l'effet du travail sur la santé en prenant en compte les différences entre salariés</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>5.</strong> <a href='https://www.youtube.com/watch?v=-u4-J0xbT0g' target='_blank'>Tenir compte de l'évolution de la technique</a> — adapter la prévention aux progrès techniques et organisationnels</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>6.</strong> <a href='https://www.youtube.com/watch?v=OcMyZRZdWbY' target='_blank'>Remplacer ce qui est dangereux</a> — éviter l'utilisation de procédés ou produits dangereux quand un résultat identique est possible avec moins de risques</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>7.</strong> <a href='https://www.youtube.com/watch?v=y4s02Ja4i_o' target='_blank'>Planifier la prévention</a> — intégrer techniques, organisation, conditions de travail et relations sociales</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>8.</strong> <a href='https://www.youtube.com/watch?v=hAUWsqlmY_4' target='_blank'>Donner la priorité aux mesures de protection collective</a> — n'utiliser les EPI qu'en complément si les protections collectives sont insuffisantes</div><div style='background:#f0f7ff;border-left:3px solid #185FA5;padding:10px 14px;border-radius:0 8px 8px 0'><strong>9.</strong> <a href='https://www.youtube.com/watch?v=QGhJbjtP08g' target='_blank'>Donner les instructions appropriées aux salariés</a> — former et informer les salariés afin qu'ils connaissent les risques et les mesures de prévention</div></div>",
+          questions: [
+            {q:"Combien de principes généraux de prévention le Code du travail définit-il ?",opts:["5","7","9","12"],answer:2},
+            {q:"Quel est le premier principe général de prévention ?",opts:["Planifier la prévention","Éviter les risques","Évaluer les risques","Adapter le travail à l'homme"],answer:1},
+            {q:"Quelle est la priorité entre protection collective et individuelle ?",opts:["La protection individuelle est prioritaire","Les deux ont la même importance","La protection collective est prioritaire","Cela dépend du risque uniquement"],answer:2}
+          ]
+        },
+        {
+          titre: "Obligations légales de l'employeur",
+          contenu: "Selon l'article L4121-1 du Code du travail, l'employeur prend les mesures nécessaires pour assurer la sécurité et protéger la santé physique et mentale des travailleurs.\n\nCes mesures comprennent :\n1 - Des actions de prévention des risques professionnels et de la pénibilité au travail\n2 - Des actions d'information et de formation\n3 - La mise en place d'une organisation et de moyens adaptés\n\nL'employeur veille à l'adaptation de ces mesures pour tenir compte du changement des circonstances et tendre à l'amélioration des situations existantes.\n\nLa démarche de prévention s'appuie également sur :\n• <a href='https://www.inrs.fr/demarche/analyse-accidents-travail.html' target='_blank'>L'analyse des accidents du travail</a>\n• <a href='https://www.inrs.fr/demarche/protection-collective.html' target='_blank'>La protection collective</a>\n• <a href='https://www.inrs.fr/demarche/protection-individuelle.html' target='_blank'>La protection individuelle</a>\n• <a href='https://www.inrs.fr/demarche/formation-information.html' target='_blank'>La formation et l'information des salariés</a>",
+          questions: [
+            {q:"Selon l'article L4121-1, l'employeur doit prendre des mesures pour :",opts:["Uniquement former les employés","Assurer la sécurité et protéger la santé physique et mentale des travailleurs","Uniquement fournir des EPI","Seulement respecter les normes techniques"],answer:1},
+            {q:"Parmi ces éléments, lequel fait partie des mesures obligatoires selon L4121-1 ?",opts:["Organiser des sorties d'équipe","Des actions d'information et de formation","Fournir une mutuelle d'entreprise","Installer des caméras de surveillance"],answer:1},
+            {q:"Que signifie 'combattre les risques à la source' dans la pratique ?",opts:["Porter des EPI dès le début","Appeler les secours rapidement","Intégrer la prévention dès la conception des lieux et équipements","Former les salariés après un accident"],answer:2}
+          ]
+        }
+      ]
+    }
+    // Modules 2 à 7 seront ajoutés au fur et à mesure
+  ]
+};
+
+// Ajouter la partie finale d'évaluation au module 1
+FORMATION.modules[0].parties.push({
+  titre: "✏️ Évaluation finale — Module 1",
+  contenu: "Vous avez terminé le contenu du Module 1 — Cadre réglementaire.\n\nCette évaluation finale porte sur l'ensemble des notions abordées dans ce module :\n• Les obligations du chef d'établissement\n• Les normes électriques et l'habilitation\n• Les 9 principes généraux de prévention\n• Les obligations légales de l'employeur\n\nObtenez au moins 70% pour valider ce module et passer au suivant.",
+  questions: [
+    {q:"Quel décret définit les obligations de l'employeur concernant les risques électriques ?",opts:["Décret n°2008-244 du 7 mars 2008","Décret n°2010-1118 du 22 septembre 2010","Décret n°2015-799 du 1er juillet 2015","Décret n°2012-523 du 20 avril 2012"],answer:1},
+    {q:"Selon l'article R4544-4, dans quel cas les travaux peuvent-ils être effectués sous tension ?",opts:["Jamais, c'est toujours interdit","Si la mise hors tension est dangereuse ou techniquement impossible","Uniquement si l'employeur le demande expressément","Toujours, car c'est plus rapide"],answer:1},
+    {q:"Quelle norme régit les installations électriques en Basse Tension (BT) ?",opts:["NF C13-100","NF C13-200","NF C15-100","NF C18-510"],answer:2},
+    {q:"Quelle norme encadre les habilitations électriques du personnel ?",opts:["NF C15-100","NF C13-100","NF C18-510","NF C13-200"],answer:2},
+    {q:"Combien de principes généraux de prévention le Code du travail définit-il ?",opts:["5","7","9","12"],answer:2},
+    {q:"Quel est le premier principe général de prévention ?",opts:["Planifier la prévention","Éviter les risques","Évaluer les risques","Adapter le travail à l'homme"],answer:1},
+    {q:"Quelle est la priorité entre protection collective et protection individuelle ?",opts:["La protection individuelle est prioritaire","Les deux ont la même importance","La protection collective est prioritaire","Cela dépend uniquement du type de risque"],answer:2},
+    {q:"Selon l'article L4121-1, l'employeur doit prendre des mesures pour :",opts:["Uniquement former les employés","Assurer la sécurité et protéger la santé physique et mentale des travailleurs","Uniquement fournir des EPI","Seulement respecter les normes techniques"],answer:1},
+    {q:"L'habilitation électrique est obligatoire pour les agents SSIAP selon :",opts:["Le Code de la construction","L'arrêté du 02 mai 2005","La norme NF C15-100","Le décret de 2010"],answer:1},
+    {q:"Que doit faire l'employeur selon l'article R4321-4 concernant les EPI ?",opts:["Les acheter et les stocker dans un local dédié","Les mettre à disposition des travailleurs et veiller à leur utilisation effective","Les fournir uniquement aux nouveaux employés","Les remplacer une fois par an obligatoirement"],answer:1}
+  ]
+});
+
+async function installer(isUpdate){
+  const btn1=document.getElementById('btn-install');
+  const btn2=document.getElementById('btn-update');
+  btn1.disabled=true;btn2.disabled=true;
+  document.getElementById('steps').style.display='block';
+
+  try{
+    step(1,'l','Connexion à Supabase...');
+    await new Promise(r=>setTimeout(r,400));
+    step(1,'o','Connexion établie ✓');
+
+    step(2,'l','Recherche de la formation...');
+    const existing=await supa('GET','formations',null,'?select=id,data');
+    const found=existing.find(f=>f.data&&f.data.title===FORMATION.title);
+    step(2,'o',found?'Formation existante trouvée ✓':'Nouvelle formation ✓');
+
+    step(3,'l',found?'Mise à jour en cours...':'Insertion en cours...');
+    if(found){
+      // Mise à jour : fusionner les modules
+      const existingModules=found.data.modules||[];
+      const newModules=[...existingModules];
+      FORMATION.modules.forEach(newMod=>{
+        const idx=newModules.findIndex(m=>m.id===newMod.id);
+        if(idx>=0){newModules[idx]=newMod;}
+        else{newModules.push(newMod);}
+      });
+      newModules.sort((a,b)=>a.id-b.id);
+      const updatedData={...found.data,modules:newModules};
+      await supa('PATCH','formations',{data:updatedData},`?id=eq.${found.id}`);
+      step(3,'o',`Formation mise à jour — ${newModules.length} module(s) ✓`);
+    }else{
+      await supa('POST','formations',{data:FORMATION});
+      step(3,'o','Formation créée avec succès ✓');
+    }
+
+    step(4,'l','Vérification finale...');
+    await new Promise(r=>setTimeout(r,400));
+    step(4,'o','Installation réussie ✓');
+
+    status(`🎉 <strong>${found?'Mise à jour':'Installation'} réussie !</strong><br><br>Module 1 — Cadre réglementaire :<br>✅ 4 parties de cours (3 questions chacune)<br>✅ 1 évaluation finale (10 questions)<br><br>Envoyez-moi le <strong>Module 2</strong> pour continuer !<br><br><a href="https://fbformations21-elearning.github.io/formation/learnflow-admin.html" style="color:#185FA5;font-weight:600">→ Ouvrir le portail admin</a>`,'ok');
+
+    btn1.style.display='none';
+    btn2.style.display='block';
+    btn2.disabled=false;
+    btn2.textContent='🔄 Mettre à jour (ajouter module suivant)';
+
+  }catch(e){
+    status('❌ Erreur : '+e.message,'err');
+    btn1.disabled=false;btn2.disabled=false;
+    step(1,'e');step(2,'e');step(3,'e');step(4,'e');
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
