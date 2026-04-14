@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escape Game — Sécurité Privée & CNAPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --noir: #080c10;
+  --gris-fonce: #10151c;
+  --gris-moyen: #181e28;
+  --gris-clair: #232c38;
+  --gris-bord: #2e3a48;
+  --or: #c9a145;
+  --or-vif: #e8c45a;
+  --rouge: #b83b2a;
+  --vert: #2a9d5c;
+  --vert-pale: rgba(42,157,92,0.12);
+  --rouge-pale: rgba(184,59,42,0.12);
+  --blanc: #edf0f4;
+  --blanc-sec: #b0bcc8;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'IBM Plex Sans', sans-serif; background: var(--noir); color: var(--blanc); min-height: 100vh; line-height: 1.6; }
+
+/* ACCUEIL */
+#ecran-accueil {
+  min-height: 100vh;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem 3rem;
+  text-align: center;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,161,69,0.07) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(255,255,255,0.018) 48px, rgba(255,255,255,0.018) 49px),
+    repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(255,255,255,0.018) 48px, rgba(255,255,255,0.018) 49px),
+    var(--noir);
+}
+.badge-top { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--or); border: 1px solid rgba(201,161,69,0.35); padding: 5px 18px; border-radius: 2px; margin-bottom: 2.2rem; text-transform: uppercase; display: inline-block; }
+.titre-principal { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px,10vw,96px); letter-spacing: 0.04em; line-height: 0.92; color: var(--blanc); margin-bottom: 0.4rem; }
+.titre-principal span { color: var(--or); }
+.sous-titre { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--blanc-sec); letter-spacing: 0.06em; margin-bottom: 2.5rem; }
+.stats-row { display: flex; gap: 2rem; justify-content: center; margin-bottom: 3rem; flex-wrap: wrap; }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--or); line-height: 1; }
+.stat-label { font-size: 11px; color: var(--blanc-sec); letter-spacing: 0.1em; text-transform: uppercase; }
+.parcours-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; width: 100%; max-width: 1000px; margin: 0 auto 2rem; }
+.parcours-card { background: var(--gris-fonce); border: 1px solid var(--gris-bord); border-radius: 4px; padding: 1.4rem; cursor: pointer; text-align: left; transition: border-color 0.2s, background 0.2s, transform 0.15s; position: relative; overflow: hidden; }
+.parcours-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--or); transform: scaleY(0); transform-origin: bottom; transition: transform 0.2s; }
+.parcours-card:hover { border-color: rgba(201,161,69,0.4); background: var(--gris-moyen); transform: translateY(-2px); }
+.parcours-card:hover::before { transform: scaleY(1); }
+.card-numero { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 0.1em; color: var(--gris-bord); position: absolute; top: 1.2rem; right: 1.4rem; }
+.card-role { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--or); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 8px; }
+.card-titre { font-size: 17px; font-weight: 600; color: var(--blanc); margin-bottom: 8px; line-height: 1.3; }
+.card-desc { font-size: 13px; color: var(--blanc-sec); line-height: 1.6; margin-bottom: 12px; }
+.card-niveau { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; padding: 3px 10px; border-radius: 2px; text-transform: uppercase; }
+.niveau-facile { background: rgba(42,157,92,0.15); color: #5acea0; border: 1px solid rgba(42,157,92,0.3); }
+.niveau-inter { background: rgba(201,161,69,0.15); color: var(--or-vif); border: 1px solid rgba(201,161,69,0.3); }
+.niveau-avance { background: rgba(184,59,42,0.15); color: #e8735a; border: 1px solid rgba(184,59,42,0.3); }
+.footer-accueil { font-size: 11px; color: var(--gris-bord); font-family: 'IBM Plex Mono', monospace; margin-top: 1rem; }
+
+/* JEU */
+#ecran-jeu { display: none; min-height: 100vh; }
+.jeu-header { background: var(--gris-fonce); border-bottom: 1px solid var(--gris-bord); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; position: sticky; top: 0; z-index: 10; }
+.jeu-parcours-nom { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--or); letter-spacing: 0.1em; text-transform: uppercase; }
+.jeu-enigme-info { font-size: 13px; color: var(--blanc-sec); }
+.jeu-score-box { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--or); letter-spacing: 0.05em; text-align: right; }
+.jeu-score-box small { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--blanc-sec); letter-spacing: 0.1em; display: block; line-height: 1; }
+.progress-bar-wrap { height: 3px; background: var(--gris-clair); width: 100%; }
+.progress-bar-inner { height: 3px; background: var(--or); transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+.jeu-body { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+.enigme-card { background: var(--gris-fonce); border: 1px solid var(--gris-bord); border-radius: 4px; padding: 2rem; margin-bottom: 1.5rem; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.enigme-num { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; color: var(--or); text-transform: uppercase; margin-bottom: 12px; }
+.enigme-contexte { font-size: 14px; color: var(--blanc-sec); font-style: italic; line-height: 1.7; padding: 12px 16px; border-left: 2px solid var(--gris-bord); background: var(--gris-moyen); border-radius: 0 4px 4px 0; margin-bottom: 1.5rem; }
+.options-list { display: flex; flex-direction: column; gap: 10px; }
+.option-btn { background: var(--gris-moyen); border: 1px solid var(--gris-bord); border-radius: 4px; padding: 12px 18px; text-align: left; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; color: var(--blanc); transition: background 0.15s, border-color 0.15s; display: flex; align-items: flex-start; gap: 12px; }
+.option-btn .opt-lettre { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--blanc-sec); min-width: 18px; margin-top: 2px; letter-spacing: 0.05em; }
+.option-btn:hover:not(:disabled) { background: var(--gris-clair); border-color: rgba(201,161,69,0.35); }
+.option-btn:disabled { cursor: default; }
+.option-btn.correct { background: var(--vert-pale); border-color: rgba(42,157,92,0.5); }
+.option-btn.correct .opt-lettre { color: #5acea0; }
+.option-btn.incorrect { background: var(--rouge-pale); border-color: rgba(184,59,42,0.5); }
+.option-btn.incorrect .opt-lettre { color: #e8735a; }
+.feedback-box { display: none; margin-top: 1.2rem; padding: 14px 18px; border-radius: 4px; font-size: 13px; line-height: 1.7; }
+.feedback-box.ok { background: var(--vert-pale); border: 1px solid rgba(42,157,92,0.35); color: #7de0b0; }
+.feedback-box.ko { background: var(--rouge-pale); border: 1px solid rgba(184,59,42,0.35); color: #e8a090; }
+.indice-section { margin-top: 1rem; }
+.indice-toggle { background: none; border: 1px solid var(--gris-bord); border-radius: 4px; padding: 6px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--blanc-sec); cursor: pointer; letter-spacing: 0.06em; transition: border-color 0.15s; }
+.indice-toggle:hover { border-color: rgba(201,161,69,0.35); color: var(--or); }
+.indice-text { display: none; margin-top: 8px; padding: 10px 14px; background: rgba(201,161,69,0.07); border-left: 2px solid var(--or); border-radius: 0 4px 4px 0; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: var(--or-vif); letter-spacing: 0.02em; }
+.nav-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.btn-retour { background: none; border: 1px solid var(--gris-bord); border-radius: 4px; padding: 10px 20px; font-size: 13px; color: var(--blanc-sec); cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; transition: border-color 0.15s, color 0.15s; }
+.btn-retour:hover { border-color: var(--blanc-sec); color: var(--blanc); }
+.btn-suivant { background: var(--or); border: none; border-radius: 4px; padding: 11px 28px; font-size: 13px; font-weight: 600; color: var(--noir); cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; letter-spacing: 0.04em; transition: background 0.15s, opacity 0.15s; }
+.btn-suivant:hover:not(:disabled) { background: var(--or-vif); }
+.btn-suivant:disabled { opacity: 0.3; cursor: default; }
+
+/* BILAN */
+#ecran-bilan { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 2rem 1rem; background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,161,69,0.06) 0%, transparent 70%), var(--noir); }
+.bilan-inner { max-width: 680px; width: 100%; }
+.bilan-header { text-align: center; margin-bottom: 2rem; }
+.bilan-label-parcours { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--or); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; }
+.bilan-score-big { font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px,15vw,108px); line-height: 1; color: var(--blanc); }
+.bilan-score-big span { color: var(--or); }
+.bilan-sous { font-size: 14px; color: var(--blanc-sec); margin-top: 4px; }
+.bilan-mention { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; padding: 5px 16px; border-radius: 2px; margin-top: 14px; }
+.bilan-stats-row { display: flex; gap: 12px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.bilan-stat { flex: 1; min-width: 120px; background: var(--gris-fonce); border: 1px solid var(--gris-bord); border-radius: 4px; padding: 1rem; text-align: center; }
+.bilan-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--or); line-height: 1; }
+.bilan-stat-label { font-size: 11px; color: var(--blanc-sec); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+.bilan-recap { background: var(--gris-fonce); border: 1px solid var(--gris-bord); border-radius: 4px; overflow: hidden; margin-bottom: 1.5rem; }
+.bilan-recap-titre { padding: 10px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: var(--blanc-sec); text-transform: uppercase; border-bottom: 1px solid var(--gris-bord); background: var(--gris-moyen); }
+.bilan-recap-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; font-size: 13px; color: var(--blanc-sec); border-bottom: 1px solid rgba(46,58,72,0.5); }
+.bilan-recap-item:last-child { border-bottom: none; }
+.recap-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.recap-dot.ok { background: var(--vert); }
+.recap-dot.ko { background: var(--rouge); }
+.bilan-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-replay { flex: 1; background: none; border: 1px solid var(--gris-bord); border-radius: 4px; padding: 12px 20px; font-size: 13px; color: var(--blanc-sec); cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; transition: border-color 0.15s, color 0.15s; }
+.btn-replay:hover { border-color: var(--blanc-sec); color: var(--blanc); }
+.btn-accueil-bilan { flex: 1; background: var(--or); border: none; border-radius: 4px; padding: 12px 20px; font-size: 13px; font-weight: 600; color: var(--noir); cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; transition: background 0.15s; }
+.btn-accueil-bilan:hover { background: var(--or-vif); }
+
+@media (max-width: 600px) {
+  .jeu-header { padding: 0.8rem 1rem; }
+  .jeu-body { padding: 1.5rem 1rem 3rem; }
+  .enigme-card { padding: 1.2rem; }
+  .stats-row { gap: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ ACCUEIL ═══════ -->
+<div id="ecran-accueil">
+  <div class="badge-top">Code de la sécurité intérieure · CNAPS · CCN · Déontologie</div>
+  <h1 class="titre-principal">ESCAPE<br><span>GAME</span><br>SÉCURITÉ</h1>
+  <p class="sous-titre">Sécurité privée · Droit réel · Légifrance vérifié</p>
+  <div class="stats-row">
+    <div><div class="stat-num">4</div><div class="stat-label">Parcours</div></div>
+    <div><div class="stat-num">48</div><div class="stat-label">Énigmes</div></div>
+    <div><div class="stat-num">3</div><div class="stat-label">Niveaux</div></div>
+    <div><div class="stat-num">∞</div><div class="stat-label">Gratuit</div></div>
+  </div>
+  <div class="parcours-grid">
+    <button class="parcours-card" onclick="lancerParcours(0)">
+      <div class="card-numero">01</div>
+      <div class="card-role">Enquêteur CNAPS</div>
+      <div class="card-titre">Le contrôle CNAPS</div>
+      <div class="card-desc">La société CIPHER PROTECTION vient d'être signalée. Vérifiez autorisations, cartes pro et conditions de moralité.</div>
+      <span class="card-niveau niveau-inter">Intermédiaire · 12 énigmes</span>
+    </button>
+    <button class="parcours-card" onclick="lancerParcours(1)">
+      <div class="card-numero">02</div>
+      <div class="card-role">Chef de poste</div>
+      <div class="card-titre">L'agent exemplaire</div>
+      <div class="card-desc">Marc B. fait l'objet d'une plainte client. Menez l'enquête déontologique : articles R631-1 à R631-32 du CSI.</div>
+      <span class="card-niveau niveau-facile">Accessible · 12 énigmes</span>
+    </button>
+    <button class="parcours-card" onclick="lancerParcours(2)">
+      <div class="card-numero">03</div>
+      <div class="card-role">Chef d'équipe événementiel</div>
+      <div class="card-titre">La nuit de la finale</div>
+      <div class="card-desc">Concert de 15 000 personnes. Fouilles, périmètre, gestion des débordements. Chaque décision compte.</div>
+      <span class="card-niveau niveau-avance">Avancé · 12 énigmes</span>
+    </button>
+    <button class="parcours-card" onclick="lancerParcours(3)">
+      <div class="card-numero">04</div>
+      <div class="card-role">Responsable RH</div>
+      <div class="card-titre">Bien dans son poste</div>
+      <div class="card-desc">Sarah Dubois, agente APS depuis 8 mois, vous pose des questions sur la CCN, le temps de travail et les procédures RH.</div>
+      <span class="card-niveau niveau-avance">Avancé · 12 énigmes</span>
+    </button>
+  </div>
+  <p class="footer-accueil">Basé sur le Livre VI du CSI · Code de déontologie · CCN prévention-sécurité · Ordonnances Macron 2017</p>
+</div>
+
+<!-- ═══════ JEU ═══════ -->
+<div id="ecran-jeu">
+  <div class="jeu-header">
+    <div>
+      <div class="jeu-parcours-nom" id="jeu-parcours-nom"></div>
+      <div class="jeu-enigme-info" id="jeu-enigme-info"></div>
+    </div>
+    <div class="jeu-score-box" id="jeu-score">0 pts<small>SCORE</small></div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-inner" id="progress-bar" style="width:0%"></div></div>
+  <div class="jeu-body">
+    <div id="zone-enigme"></div>
+    <div class="nav-row">
+      <button class="btn-retour" onclick="retourAccueil()">← Parcours</button>
+      <button class="btn-suivant" id="btn-suivant" onclick="enigmeSuivante()" disabled>Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ BILAN ═══════ -->
+<div id="ecran-bilan">
+  <div class="bilan-inner">
+    <div class="bilan-header">
+      <div class="bilan-label-parcours" id="bilan-parcours-nom"></div>
+      <div class="bilan-score-big" id="bilan-score-big"></div>
+      <div class="bilan-sous" id="bilan-sous"></div>
+      <div class="bilan-mention" id="bilan-mention"></div>
+    </div>
+    <div class="bilan-stats-row" id="bilan-stats"></div>
+    <div class="bilan-recap">
+      <div class="bilan-recap-titre">Récapitulatif des réponses</div>
+      <div id="bilan-recap-list"></div>
+    </div>
+    <div class="bilan-actions">
+      <button class="btn-replay" onclick="rejouerParcours()">↻ Rejouer ce parcours</button>
+      <button class="btn-accueil-bilan" onclick="retourAccueil()">← Choisir un parcours</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const L = ['A','B','C','D'];
+const PARCOURS = [
+  { nom:"Parcours 1 — Le contrôle CNAPS", enigmes:[
+    {q:"Autorisation préalable d'exercice",ctx:"Lors du contrôle de CIPHER PROTECTION, vous constatez que la société exerce des activités de surveillance humaine. Quel document principal doit détenir l'entreprise ?",opts:["Une simple déclaration en préfecture","Une autorisation délivrée par le CNAPS","Un agrément du ministère de l'Intérieur","Un enregistrement à la chambre de commerce"],rep:1,fb:"Exact. En vertu de l'article L612-6 du CSI, toute entreprise exerçant des activités privées de sécurité doit être préalablement autorisée par le CNAPS. Une simple déclaration ne suffit pas.",ind:"Art. L612-6 CSI — autorisation préalable et expresse obligatoire."},
+    {q:"Validité de la carte professionnelle",ctx:"Un agent en poste présente une carte professionnelle expirée depuis 3 semaines. La direction affirme que le renouvellement est en cours.",opts:["L'agent peut rester en poste 3 mois supplémentaires","L'agent doit immédiatement cesser d'exercer","L'agent peut terminer sa vacation en cours uniquement","Un délai de grâce de 6 mois existe si le dossier est déposé"],rep:1,fb:"L'article L612-20 du CSI est sans ambiguïté : l'exercice sans carte professionnelle valide est illicite. L'agent doit cesser immédiatement. Aucun délai de grâce n'existe en droit positif.",ind:"Art. L612-20 CSI — la carte est une condition sine qua non d'exercice."},
+    {q:"Condition de moralité — casier judiciaire",ctx:"Un agent présente un casier judiciaire avec une condamnation à 3 mois de sursis pour conduite en état d'ivresse, datant de 2 ans.",opts:["La condamnation est automatiquement éliminatoire","Le CNAPS apprécie au cas par cas selon la nature des faits","Seules les peines de prison ferme sont rédhibitoires","La condamnation est sans incidence si elle est ancienne de plus d'un an"],rep:1,fb:"Le CNAPS procède à une appréciation individualisée. Certaines infractions sont explicitement éliminatoires (crimes, atteintes aux personnes…), d'autres sont examinées en contexte. Art. L612-20 et R612-14 du CSI.",ind:"Art. R612-14 CSI liste les condamnations incompatibles. Au-delà, appréciation souveraine du CNAPS."},
+    {q:"Port d'une tenue sans mention employeur",ctx:"Des agents portent une tenue sans mention visible du nom de l'entreprise. La direction invoque un marché confidentiel.",opts:["La tenue est libre dès lors qu'elle n'imite pas les forces de l'ordre","La tenue doit obligatoirement mentionner la dénomination sociale de l'employeur","Seul le badge nominatif est obligatoire","Une dérogation préfectorale suffit"],rep:1,fb:"L'article L612-11 du CSI impose que la tenue des agents fasse apparaître la dénomination de l'entreprise. L'obligation subsiste quelles que soient les clauses contractuelles avec le donneur d'ordre.",ind:"Art. L612-11 CSI — tenue réglementée, dénomination sociale obligatoire."},
+    {q:"Registre des contrôles internes",ctx:"Le registre de contrôles internes ne contient aucune entrée depuis 4 mois. L'entreprise emploie 40 agents.",opts:["Un registre vide sur 4 mois constitue une irrégularité sanctionnable","Le registre n'est obligatoire qu'au-delà de 50 salariés","Le registre peut être dématérialisé mais n'est pas mensuel","Seul le délégué territorial du CNAPS peut l'exiger"],rep:0,fb:"Le registre de contrôles internes est une obligation réglementaire (art. R613-1 CSI). Son absence de renseignement expose l'entreprise à une sanction disciplinaire du CNAPS, indépendamment du nombre de salariés.",ind:"Art. R613-1 CSI — contrôle interne obligatoire et traçable."},
+    {q:"Sous-traitance et autorisation CNAPS",ctx:"CIPHER PROTECTION sous-traite 30 % de ses missions à une société sœur non autorisée par le CNAPS.",opts:["La sous-traitance est libre entre sociétés liées","Toute entreprise sous-traitante doit être autorisée par le CNAPS","Seul le donneur d'ordre initial est responsable","Une déclaration au CNAPS sous 8 jours suffit"],rep:1,fb:"L'article L612-6 du CSI s'applique à tout prestataire exerçant des activités de sécurité privée, quelle que soit la structure juridique. Le lien capitalistique n'emporte aucune dispense d'autorisation.",ind:"Art. L612-6 CSI — obligation d'autorisation sans exception."},
+    {q:"Gamme des sanctions du CNAPS",ctx:"Après contrôle, vous rédigez votre rapport. Quelle gamme de sanctions le CNAPS peut-il prononcer ?",opts:["Uniquement des amendes financières","Avertissement, blâme, suspension, retrait d'autorisation, amende jusqu'à 150 000 €","Suspension d'activité uniquement","Avertissement et amende jusqu'à 3 000 €"],rep:1,fb:"L'article L634-4 du CSI établit la gamme complète : avertissement, blâme, interdiction temporaire d'exercice, retrait d'autorisation, et amende jusqu'à 150 000 € (personne morale). Les sanctions pénales relèvent en parallèle des tribunaux.",ind:"Art. L634-4 CSI — palette des sanctions disciplinaires du CNAPS."},
+    {q:"Consultation du casier judiciaire par l'employeur",ctx:"Le directeur de CIPHER PROTECTION affirme consulter lui-même le casier judiciaire de ses candidats avant embauche.",opts:["C'est légal : l'employeur a un droit de vérification","C'est illégal : seul le CNAPS peut consulter le bulletin n°2","C'est légal uniquement pour les postes à responsabilité","L'employeur peut consulter le bulletin n°3 uniquement"],rep:1,fb:"Seul le CNAPS est habilité à consulter le bulletin n°2 du casier judiciaire (art. L612-22 CSI). L'employeur peut uniquement demander au candidat de produire le bulletin n°3 pour certains postes.",ind:"Art. L612-22 CSI — monopole du CNAPS sur la consultation du bulletin n°2."},
+    {q:"Activités mixtes interdites",ctx:"CIPHER PROTECTION propose aussi des prestations de domiciliation d'entreprises depuis ses locaux. Est-ce légal ?",opts:["Oui, dès lors que c'est une activité accessoire","Non, une entreprise autorisée CNAPS ne peut exercer qu'une activité principale de sécurité","Oui, si les activités sont séparées comptablement","Non, sauf dérogation préfectorale"],rep:1,fb:"L'article L612-1 du CSI pose le principe de spécialité : les entreprises autorisées ne peuvent exercer d'autre activité à titre principal. L'activité de sécurité doit être principale.",ind:"Art. L612-1 CSI — principe de spécialité des entreprises de sécurité."},
+    {q:"Silence de l'administration sur la demande d'autorisation",ctx:"CIPHER PROTECTION prétend avoir attendu 6 mois sans réponse et a décidé de démarrer son activité. Est-ce justifié ?",opts:["Oui, le silence vaut acceptation après 2 mois","Non, le silence vaut rejet : aucune activité sans autorisation expresse","Oui, si la demande est complète depuis plus de 3 mois","Non, mais un recours permet de démarrer sous conditions"],rep:1,fb:"En matière d'autorisation d'activité privée de sécurité, le silence de l'administration ne vaut pas acceptation. Aucune activité ne peut commencer sans l'autorisation expresse du CNAPS (art. L612-6 CSI).",ind:"Art. L612-6 CSI — autorisation expresse et préalable obligatoire."},
+    {q:"Dirigeant ressortissant hors UE",ctx:"Le gérant de CIPHER PROTECTION est ressortissant d'un pays tiers à l'UE. Peut-il diriger l'entreprise ?",opts:["Non, la direction est réservée aux nationaux français","Oui, s'il dispose d'un titre de séjour autorisant une activité commerciale","Non, seuls les ressortissants UE/EEE sont admis","Oui, sans condition particulière"],rep:1,fb:"L'article L612-7 du CSI prévoit des conditions de nationalité ou de titre de séjour pour les dirigeants. Un ressortissant non-UE peut diriger sous réserve de détenir un titre de séjour comportant une autorisation d'exercice d'activité professionnelle.",ind:"Art. L612-7 CSI — conditions applicables aux dirigeants d'entreprises de sécurité."},
+    {q:"Délai contradictoire après notification du rapport",ctx:"Après notification du rapport de contrôle, dans quel délai CIPHER PROTECTION peut-elle présenter ses observations ?",opts:["8 jours calendaires","15 jours à compter de la notification","1 mois","Aucun délai : la décision est immédiate"],rep:1,fb:"La procédure contradictoire devant le CNAPS garantit à l'entreprise contrôlée un délai de 15 jours pour présenter ses observations écrites après notification du rapport, avant toute décision de la commission de discipline (art. R634-3 CSI).",ind:"Art. R634-3 CSI — délai du contradictoire."}
+  ]},
+  { nom:"Parcours 2 — L'agent exemplaire", enigmes:[
+    {q:"Obligation de neutralité politique",ctx:"Marc B. a posté sur son compte personnel un message de soutien à un candidat lors d'une élection locale, depuis son domicile, hors service.",opts:["Faute grave : l'agent est astreint à une neutralité absolue en tout temps","C'est une liberté fondamentale : hors service, Marc dispose de sa liberté d'expression","Faute uniquement si le compte mentionne son employeur","Interdit pendant les 30 jours précédant un scrutin"],rep:1,fb:"Le code de déontologie (art. R631-12) impose la neutralité en service. Hors service, sur un compte personnel n'identifiant pas sa qualité d'agent, la liberté d'expression s'applique pleinement.",ind:"Art. R631-12 CSI — neutralité en service, liberté fondamentale hors service."},
+    {q:"Principe de proportionnalité dans l'usage de la force",ctx:"Marc B. a immobilisé fermement un visiteur agité qui refusait de quitter les lieux après plusieurs demandes verbales. Le visiteur n'était pas violent physiquement.",opts:["Usage disproportionné : seules les menaces physiques avérées justifient la force","Usage potentiellement justifié si le comportement précédait le refus de quitter","Usage toujours justifié : l'agent peut user de la force pour faire respecter les consignes","Usage interdit : seul un OPJ peut contraindre physiquement"],rep:1,fb:"L'article R631-7 du CSI impose la proportionnalité. L'immobilisation d'une personne refusant de quitter les lieux peut être justifiée si elle est strictement nécessaire et proportionnée. Cela s'apprécie in concreto.",ind:"Art. R631-7 CSI — proportionnalité de la réponse."},
+    {q:"Secret professionnel",ctx:"Marc B. a confié à sa femme les noms de clients VIP dont il assure la protection, sans informations supplémentaires.",opts:["Violation : les noms des clients sont couverts par l'obligation de discrétion","Ce n'est pas une faute : les noms ne constituent pas des informations sensibles","Faute uniquement si les informations sont utilisées à des fins commerciales","Le secret ne concerne que les informations classifiées"],rep:0,fb:"L'article R631-10 du CSI impose l'obligation de discrétion sur toutes les informations obtenues dans l'exercice des fonctions, y compris l'identité des personnes protégées. La divulgation à un tiers constitue une faute.",ind:"Art. R631-10 CSI — discrétion absolue sur les informations obtenues."},
+    {q:"Obligation de signalement d'un incident",ctx:"Marc B. découvre un début d'incendie. Il l'éteint lui-même et n'informe ni son chef de poste ni les secours.",opts:["Bonne initiative : l'extinction rapide a évité des dégâts","Faute : Marc devait alerter les secours et sa hiérarchie même après extinction","Faute uniquement si l'incendie avait causé des dégâts","Pas de faute si l'extinction n'a nécessité qu'un extincteur"],rep:1,fb:"L'article R631-5 du CSI impose l'alerte des autorités compétentes et de la hiérarchie dans toute situation d'urgence. L'extinction de l'incendie ne dispense pas de l'obligation de signalement.",ind:"Art. R631-5 CSI — obligation d'alerte et de signalement."},
+    {q:"Acceptation de pourboires",ctx:"Un client satisfait remet spontanément 20 € à Marc B. en fin de mission. Marc accepte.",opts:["Faute déontologique : tout avantage est interdit","Toléré si le montant est inférieur à un seuil fixé par l'employeur","Faute uniquement si l'avantage influence le comportement de l'agent","Légal si l'agent déclare la somme à son employeur"],rep:0,fb:"L'article R631-11 du CSI interdit aux agents d'accepter tout avantage, quelle qu'en soit la valeur, de la part des personnes avec lesquelles ils sont en contact dans l'exercice de leurs fonctions.",ind:"Art. R631-11 CSI — interdiction absolue d'accepter des avantages."},
+    {q:"Présentation de la carte professionnelle",ctx:"Un visiteur demande à Marc de lui montrer sa carte professionnelle pour vérifier son identité.",opts:["Marc est tenu de la présenter à toute demande","Marc n'est tenu de la présenter qu'aux autorités de police et au CNAPS","Marc peut refuser si cela compromet la mission","Marc doit la présenter uniquement à son supérieur"],rep:0,fb:"L'article L612-20 du CSI impose à tout agent de présenter sa carte professionnelle à toute personne qui en fait la demande. Cette obligation est inconditionnelle.",ind:"Art. L612-20 CSI — présentation obligatoire à toute demande."},
+    {q:"Discrimination dans l'exercice des missions",ctx:"Marc a refusé de laisser entrer un groupe de jeunes perçus comme « à risque » en se basant uniquement sur leur apparence vestimentaire.",opts:["C'est dans les prérogatives de l'agent : il apprécie souverainement les risques","C'est une faute déontologique et potentiellement une infraction pénale","C'est toléré dans les établissements privés selon le règlement intérieur","C'est un droit si le motif figure dans la consigne de filtrage"],rep:1,fb:"L'article R631-15 du CSI interdit toute discrimination dans l'exercice des missions. Un refus d'accès fondé sur l'apparence sans élément objectif constitue une faute déontologique et peut relever de l'article 225-1 du Code pénal.",ind:"Art. R631-15 CSI et art. 225-1 Code pénal — discrimination interdite."},
+    {q:"Devoir de réserve et médias",ctx:"Marc a accordé un entretien à un journaliste local sur ses conditions de travail, sans en informer son employeur.",opts:["C'est son droit : la liberté d'expression est constitutionnelle","Faute déontologique si des informations confidentielles ont été divulguées","Interdit : les agents de sécurité ne peuvent s'exprimer dans les médias","Légal uniquement pour les représentants syndicaux"],rep:1,fb:"La liberté d'expression de Marc lui permet de témoigner sur ses conditions de travail. Toutefois, si l'entretien révèle des informations couvertes par l'obligation de discrétion (art. R631-10 CSI), cela constitue une faute.",ind:"Art. R631-10 CSI — discrétion vs liberté d'expression : appréciation au cas par cas."},
+    {q:"Obligation d'identification lors d'une rétention",ctx:"Marc retient brièvement une personne suspecte en attendant la police. Doit-il s'identifier auprès d'elle ?",opts:["Non, l'identification de l'agent n'est pas obligatoire lors d'une rétention","Oui, l'agent doit se présenter et exposer la raison de la rétention","Non, seule la police a l'obligation de s'identifier","Oui, mais uniquement si la personne le demande explicitement"],rep:1,fb:"Le code de déontologie (art. R631-2) impose à l'agent de se présenter et d'informer la personne concernée du motif de son intervention. Cette obligation est absolue, notamment lors de toute mesure de contrainte.",ind:"Art. R631-2 CSI — obligation d'identification et de transparence."},
+    {q:"Maîtrise de soi face à une provocation verbale",ctx:"Un client l'insulte copieusement. Marc répond par des insultes équivalentes avant de le faire sortir.",opts:["Marc a agi dans les limites de la légitime défense verbale","Faute déontologique : l'agent doit maintenir son calme et sa dignité","Toléré si l'insulte initiale constitue une provocation grave","Faute uniquement si les propos sont entendus par des tiers"],rep:1,fb:"L'article R631-3 du CSI impose aux agents d'exercer leurs fonctions avec discernement et dignité. La riposte verbale par des insultes, quelles que soient les provocations reçues, constitue une faute déontologique.",ind:"Art. R631-3 CSI — dignité et maîtrise de soi en toutes circonstances."},
+    {q:"Formation continue et renouvellement de la carte pro",ctx:"Marc exerce depuis 6 ans sans aucune formation de perfectionnement depuis sa formation initiale.",opts:["Régulier : la formation initiale suffit pour toute la carrière","Irrégulier : un recyclage est obligatoire tous les 5 ans pour le renouvellement","Irrégulier : la formation continue est annuelle et obligatoire","Laissé à l'appréciation de l'employeur"],rep:1,fb:"Le renouvellement de la carte professionnelle (art. L612-21 CSI) est conditionné à une actualisation des compétences. L'absence de formation de perfectionnement peut compromettre le renouvellement de la carte.",ind:"Art. L612-21 CSI — conditions de renouvellement de la carte professionnelle."},
+    {q:"Palpations de sécurité et consentement",ctx:"À l'entrée d'un stade, Marc pratique des palpations de sécurité systématiques sans que les personnes aient consenti.",opts:["Légal dans les enceintes sportives sans condition","La palpation de sécurité requiert le consentement exprès de la personne","Les fouilles visuelles sont libres mais la palpation nécessite un OPJ","Les agents de sécurité n'ont jamais le droit de palper"],rep:1,fb:"L'article L613-2 du CSI autorise les palpations de sécurité lors de manifestations sportives, uniquement avec le consentement exprès de la personne. En l'absence de consentement, l'acte peut constituer une violation de l'intégrité physique.",ind:"Art. L613-2 CSI — palpations de sécurité : consentement obligatoire."}
+  ]},
+  { nom:"Parcours 3 — La nuit de la finale", enigmes:[
+    {q:"Critères de fouille non discriminatoires",ctx:"Pour ce concert de 15 000 personnes, le client souhaite que les agents fouillent différemment les personnes selon leur tenue vestimentaire.",opts:["Les critères de fouille peuvent être modulés selon l'apparence vestimentaire","Les fouilles doivent être appliquées selon des critères objectifs et non discriminatoires","La direction artistique peut fixer les critères de contrôle","Le profilage est admis s'il figure dans des consignes écrites"],rep:1,fb:"L'article L613-2 du CSI et le code de déontologie (R631-15) imposent des contrôles fondés sur des critères objectifs et non discriminatoires. Un filtrage modulé selon l'apparence vestimentaire constitue une discrimination caractérisée.",ind:"Art. L613-2 CSI et R631-15 — non-discrimination absolue dans les contrôles."},
+    {q:"Pouvoir du préfet sur les effectifs de sécurité",ctx:"Le client a prévu 10 agents pour 15 000 spectateurs. Le préfet a-t-il un mot à dire ?",opts:["Non, le dispositif relève exclusivement de la responsabilité de l'organisateur","Oui, le préfet peut imposer un dispositif minimal dans le cadre de l'autorisation préfectorale","Oui, mais seulement si l'événement est public","Non, seul le CNAPS peut intervenir sur les effectifs"],rep:1,fb:"Pour les manifestations de grande ampleur, le préfet peut imposer un dispositif de sécurité minimal dans le cadre de l'autorisation de manifestation (art. L211-11 CSI). Il peut également exiger un service d'ordre professionnel.",ind:"Art. L211-11 CSI — pouvoir préfectoral sur les dispositifs de sécurité."},
+    {q:"Coordination avec les forces de l'ordre",ctx:"Des renforts de police arrivent suite à une échauffourée. Un commissaire donne des ordres directement à vos agents.",opts:["Vos agents doivent obéir directement au commissaire qui prend le commandement","Vos agents restent sous votre commandement mais doivent coopérer avec les forces de l'ordre","Vos agents peuvent refuser les ordres des forces de l'ordre","Vos agents transfèrent automatiquement leur commandement à la police"],rep:1,fb:"Les agents de sécurité privée ne sont jamais placés sous le commandement des forces de l'ordre. La hiérarchie contractuelle demeure. En revanche, l'obligation de coopération avec les autorités est totale (art. R631-5 CSI).",ind:"Art. R631-5 CSI — coopération sans subordination hiérarchique."},
+    {q:"Durée de rétention d'un individu perturbateur",ctx:"Un spectateur tente de forcer une entrée. Vos agents le retiennent 40 minutes en attendant la police qui tarde.",opts:["La rétention est légale si l'individu représente un danger","La durée maximale sans OPJ est de 60 minutes","La rétention par des agents de sécurité privée est toujours illicite","La rétention est possible le temps strictement nécessaire à l'arrivée des forces de l'ordre"],rep:3,fb:"Les agents de sécurité privée n'ont pas de pouvoir de garde à vue. Ils peuvent retenir brièvement une personne en cas de flagrant délit (art. 73 CPP), le temps de la remettre à un OPJ. 40 minutes commence à dépasser le raisonnable. L'alerte des forces de l'ordre doit être immédiate.",ind:"Art. 73 CPP — rétention citoyenne, et art. L613-6 CSI."},
+    {q:"Sortie de secours obstruée",ctx:"Une sortie de secours est bloquée par du matériel de scène. Le responsable technique refuse de la dégager.",opts:["Vous devez respecter la décision du responsable technique du client","Vous devez exiger le dégagement immédiat et, en cas de refus, alerter les autorités","Vous pouvez dégager vous-même l'obstruction sans accord","Vous consignez l'incident et poursuivez la mission"],rep:1,fb:"La sécurité des personnes prime sur toute considération contractuelle. L'agent doit signaler l'irrégularité et, en cas de refus du responsable, alerter immédiatement les services de secours et les autorités.",ind:"Art. R631-5 CSI — obligation de signalement et sécurité des personnes."},
+    {q:"Consommation d'alcool en service",ctx:"Vous constatez qu'un de vos agents a consommé de l'alcool en service. Il ne présente aucun signe d'ivresse.",opts:["Tolérable si l'agent est en capacité d'exercer ses fonctions","L'agent doit être immédiatement retiré du dispositif","Seule l'ivresse manifeste justifie un retrait","Vous devez d'abord effectuer un test alcoolémie avant de décider"],rep:1,fb:"L'article R631-9 du CSI interdit formellement aux agents de consommer de l'alcool pendant le service, indépendamment de tout état d'ivresse. La consommation elle-même suffit à caractériser la faute.",ind:"Art. R631-9 CSI — interdiction absolue de consommation d'alcool en service."},
+    {q:"Obligation de porter secours sans formation",ctx:"Un spectateur s'effondre. Vos agents interviennent, mais aucun n'a de formation PSC1.",opts:["Vos agents peuvent assister sans formation : les gestes d'urgence ne requièrent pas de certification","Vos agents doivent alerter le Samu/pompiers et ne pas intervenir sans formation","Une formation PSC1 est obligatoire pour les agents de sécurité selon la CCN","L'intervention médicale des agents est exclue pour des raisons de responsabilité"],rep:0,fb:"Toute personne peut et doit porter secours à une personne en danger (art. 223-6 Code pénal). Cette obligation prime sur toute considération de formation. L'alerte des secours doit être immédiate ET des gestes de premiers secours basiques peuvent être prodigués.",ind:"Art. 223-6 Code pénal — obligation universelle de porter secours."},
+    {q:"Port d'armes en sécurité événementielle",ctx:"Un client vous demande que vos agents soient armés pour un concert privé de célébrité.",opts:["Possible avec une autorisation du préfet","Possible si les agents ont leur CQP armement","Interdit pour la sécurité événementielle : les armes sont réservées à certaines activités spécifiques","Possible si le donneur d'ordre prend la responsabilité par écrit"],rep:2,fb:"Le port d'armes en sécurité privée est autorisé pour certaines activités (transport de fonds, sites sensibles — art. L612-9 CSI), mais pas pour la sécurité événementielle ordinaire. Aucune dérogation contractuelle n'est possible.",ind:"Art. L612-9 CSI — liste limitative des activités autorisant le port d'armes."},
+    {q:"Main courante et rapport d'incident",ctx:"Une bagarre éclate, blessant légèrement deux spectateurs. La direction vous demande de ne pas la noter pour « préserver l'image ».",opts:["Vous pouvez accéder à la demande si les blessés ne déposent pas plainte","La main courante doit être renseignée indépendamment de toute plainte","La notation est obligatoire uniquement pour les incidents graves","Seul le client décide de ce qui figure dans les registres"],rep:1,fb:"La main courante et les rapports d'incidents font partie des obligations documentaires des agents de sécurité privée (art. R613-1 CSI). Leur omission est une faute grave. Le donneur d'ordre ne peut s'y opposer.",ind:"Art. R613-1 et R631-10 CSI — obligation de traçabilité des incidents."},
+    {q:"Abandon de poste en l'absence de relève",ctx:"La vacation de nuit se termine mais la relève n'arrive pas. Vos agents peuvent-ils quitter le poste ?",opts:["Oui, la fin de vacation libère l'agent de toute obligation","Non, l'agent ne peut quitter son poste sans relève assurée sauf accord hiérarchique","Oui, si l'employeur n'a pas assuré la relève dans le délai convenu","Non, en aucun cas et sans limite de durée"],rep:1,fb:"L'agent ne peut abandonner son poste sans relève, ce qui constituerait une faute grave. Il doit alerter sa hiérarchie et attendre les instructions. Cependant, les heures supplémentaires générées sont dues.",ind:"Jurisprudence sociale — abandon de poste vs obligation de continuité du service."},
+    {q:"Responsabilité en cas d'incident non signalé",ctx:"Un incident mineur n'a pas été reporté. Deux jours plus tard, une plainte est déposée. Qui est responsable ?",opts:["Uniquement l'employeur, l'agent n'étant qu'un exécutant","L'agent qui n'a pas rédigé le rapport peut voir sa responsabilité personnelle engagée","Uniquement le client du site, donneur d'ordre","La responsabilité est automatiquement partagée entre agent et employeur"],rep:1,fb:"La responsabilité de l'agent peut être engagée personnellement pour manquement à ses obligations de signalement (art. R631-5 CSI). Elle n'exclut pas celle de l'employeur, mais l'agent ne peut invoquer son statut d'exécutant pour s'y soustraire.",ind:"Art. R631-5 CSI — responsabilité personnelle de l'agent en matière de signalement."},
+    {q:"Qualification obligatoire de l'agent cynophile",ctx:"Vous souhaitez déployer un binôme cynophile pour le périmètre externe. Quelle formation le maître-chien doit-il détenir ?",opts:["La carte professionnelle standard suffit","Une qualification spécifique maître-chien est obligatoire en plus de la carte professionnelle","Seule une attestation de l'employeur est requise","Aucune formation spécifique : la carte professionnelle couvre toutes les activités"],rep:1,fb:"L'activité de surveillance par agent cynophile requiert une qualification spécifique (Titre à finalité professionnelle maître-chien de sécurité) en complément de la carte professionnelle générale (art. L612-2 et R612-7 CSI).",ind:"Art. R612-7 CSI — qualifications spécifiques pour les agents cynophiles."}
+  ]},
+  { nom:"Parcours 4 — Bien dans son poste", enigmes:[
+    {q:"Classification CCN de Sarah",ctx:"Sarah Dubois est agente APS depuis 8 mois, sans responsabilité d'encadrement. Quelle est sa classification minimale selon la CCN des entreprises de prévention et de sécurité ?",opts:["Coefficient 120 — Employé niveau 1","Coefficient 140 — Agent de sécurité qualification 1 (APS-1)","Coefficient 150 — Agent de sécurité qualification 2 (APS-2)","Coefficient 130 — Agent de sécurité non qualifié"],rep:1,fb:"La CCN des entreprises de prévention et de sécurité prévoit qu'un agent APS titulaire de son CQP entre au coefficient 140 (APS-1). L'ancienneté de 8 mois ne modifie pas encore le coefficient de base hors prime d'ancienneté.",ind:"CCN prévention-sécurité, annexe 1 — grille de classification."},
+    {q:"Durée maximale hebdomadaire de travail",ctx:"Sarah vous demande si son planning à 48 heures cette semaine est légal. C'est la troisième semaine consécutive à ce niveau.",opts:["Illégal : la durée maximale hebdomadaire est de 44 heures","Légal ponctuellement, mais la moyenne sur 12 semaines ne peut dépasser 44 heures","Illégal uniquement si Sarah en fait la demande écrite","Légal : la CCN prévoit 48 h/semaine pour les agents de sécurité"],rep:1,fb:"L'article L3121-20 du Code du travail fixe la durée maximale hebdomadaire absolue à 48 heures. La durée moyenne sur 12 semaines ne doit pas excéder 44 heures (art. L3121-22 CT). La CCN ne peut pas dépasser ces plafonds légaux.",ind:"Art. L3121-20 et L3121-22 Code du travail — durées maximales de travail."},
+    {q:"Repos quotidien minimum",ctx:"Sarah a terminé sa vacation à 6h du matin et doit reprendre à 13h le même jour. Est-ce légal ?",opts:["Oui si elle est volontaire","Non : le repos quotidien minimal est de 11 heures consécutives","Oui : la CCN sécurité prévoit une exception à 8 heures","Non : le repos minimal est de 9 heures dans la sécurité privée"],rep:1,fb:"L'article L3131-1 du Code du travail impose un repos quotidien d'au moins 11 heures consécutives entre deux prises de service. Ce minimum est d'ordre public : aucun accord ni volonté du salarié ne peut y déroger.",ind:"Art. L3131-1 Code du travail — 11 heures de repos quotidien minimum."},
+    {q:"Première étape d'un licenciement pour faute",ctx:"Sarah vous demande quelle est la première étape obligatoire d'une procédure de licenciement pour faute grave.",opts:["Envoi d'une lettre recommandée de licenciement avec motif","Convocation à un entretien préalable avec notification du motif","Mise à pied conservatoire systématique","Consultation préalable des représentants du personnel"],rep:1,fb:"L'article L1232-2 du Code du travail impose la convocation à un entretien préalable avant toute décision de licenciement. L'entretien doit avoir lieu au moins 5 jours ouvrables après présentation de la lettre.",ind:"Art. L1232-2 Code du travail — entretien préalable obligatoire."},
+    {q:"Préavis de démission selon la CCN sécurité",ctx:"Sarah envisage de démissionner. Quelle est la durée de son préavis selon la CCN sécurité privée (ancienneté < 1 an) ?",opts:["1 mois pour un agent ayant moins d'un an d'ancienneté","2 mois quel que soit le niveau d'ancienneté","1 semaine pour les 6 premiers mois, puis 1 mois","Pas de préavis si la démission est motivée par une faute de l'employeur"],rep:0,fb:"La CCN des entreprises de prévention et de sécurité prévoit un préavis de démission d'1 mois pour les agents non cadres ayant moins d'un an d'ancienneté. Ce délai monte à 2 mois au-delà d'un an d'ancienneté.",ind:"CCN prévention-sécurité, titre V — préavis de démission."},
+    {q:"Hiérarchie des normes en droit du travail",ctx:"Sarah vous demande laquelle de ces sources prime sur les autres en cas de conflit : la CCN, le contrat de travail, la loi ou l'accord d'entreprise ?",opts:["Loi > CCN > accord d'entreprise > contrat de travail","Contrat de travail > accord d'entreprise > CCN > loi","La source la plus favorable au salarié prime toujours sur les autres","CCN > loi > accord d'entreprise > contrat de travail"],rep:0,fb:"La hiérarchie classique est : Constitution > loi > accord de branche > accord d'entreprise > contrat de travail. Depuis les ordonnances Macron de 2017, l'accord d'entreprise peut déroger à la CCN dans certains domaines ouverts à la négociation.",ind:"Ordonnances Macron de sept. 2017 — réforme de la hiérarchie des normes."},
+    {q:"Acquisition des congés payés",ctx:"Sarah vous demande combien de jours de congés payés elle a acquis après ses 8 mois de travail.",opts:["20 jours ouvrables (2,5 jours × 8 mois)","24 jours ouvrés","16 jours ouvrés","30 jours calendaires"],rep:0,fb:"En droit français, les congés payés s'acquièrent à raison de 2,5 jours ouvrables par mois de travail effectif (art. L3141-3 CT). Après 8 mois complets : 8 × 2,5 = 20 jours ouvrables.",ind:"Art. L3141-3 Code du travail — calcul des congés payés."},
+    {q:"Visite médicale d'embauche — responsabilité",ctx:"Sarah n'a pas encore eu de visite médicale 8 mois après son embauche. Qui est responsable ?",opts:["Sarah, qui doit la demander elle-même","L'employeur, tenu d'organiser la visite d'information et de prévention dans les délais","Le médecin du travail, qui programme les visites de façon autonome","Aucun : la visite n'est obligatoire qu'après 1 an d'ancienneté"],rep:1,fb:"L'employeur est responsable de l'organisation de la visite d'information et de prévention (VIP) dans les 3 mois suivant la prise de poste (art. R4624-10 CT). L'absence de visite engage la responsabilité de l'employeur.",ind:"Art. R4624-10 Code du travail — visite d'information et de prévention."},
+    {q:"Prime de panier lors des vacations de nuit",ctx:"Sarah vous demande si elle a droit à la prime de panier lors de ses vacations de nuit.",opts:["Oui, si la vacation dépasse 6 heures et inclut une plage horaire entre 21h et 6h","Non, la prime de panier n'existe pas dans la sécurité privée","Oui, uniquement pour les agents travaillant plus de 5 nuits consécutives","Oui, pour toute vacation nocturne quelle que soit sa durée"],rep:0,fb:"La CCN des entreprises de prévention et de sécurité prévoit une indemnité de repas (prime de panier) pour les vacations de nuit dépassant 6 heures et couvrant une plage horaire nocturne définie dans l'annexe salariale.",ind:"CCN prévention-sécurité, annexe salariale — indemnité de repas/panier de nuit."},
+    {q:"Contreparties obligatoires au travail de nuit",ctx:"Sarah travaille régulièrement entre 21h et 6h. Quelles contreparties lui sont dues ?",opts:["Une majoration de salaire uniquement","Un repos compensateur obligatoire ou une majoration salariale selon accord","Aucune contrepartie légale obligatoire au-delà du salaire de base","Une majoration de 25 % imposée par le Code du travail"],rep:1,fb:"L'article L3122-8 du Code du travail impose des contreparties au travail de nuit sous forme de repos compensateur et/ou de compensation salariale. Les modalités sont fixées par accord d'entreprise ou de branche (CCN).",ind:"Art. L3122-8 Code du travail et CCN — contreparties au travail de nuit."},
+    {q:"Participation patronale minimale à la mutuelle",ctx:"Sarah souhaite adhérer à la mutuelle de l'entreprise. Quelle est la part minimale que votre société doit prendre en charge ?",opts:["25 % de la cotisation","50 % de la cotisation","100 % pour les agents de sécurité","La participation patronale est facultative"],rep:1,fb:"Depuis la loi ANI de 2013 (art. L911-7 CSS), l'employeur doit financer au moins 50 % de la cotisation de la complémentaire santé collective obligatoire. Cette règle s'applique à tous les salariés du secteur privé.",ind:"Art. L911-7 Code de la sécurité sociale — participation patronale minimale de 50 %."},
+    {q:"Délai de rétractation d'une rupture conventionnelle",ctx:"Sarah et son employeur ont signé une rupture conventionnelle aujourd'hui. Dans quel délai peut-elle se rétracter ?",opts:["5 jours ouvrables","15 jours calendaires à compter du lendemain de la signature","7 jours ouvrables","30 jours calendaires"],rep:1,fb:"L'article L1237-13 du Code du travail prévoit un délai de rétractation de 15 jours calendaires pour chacune des parties, courant à compter du lendemain de la date de signature de la convention de rupture.",ind:"Art. L1237-13 Code du travail — rétractation en 15 jours calendaires."}
+  ]}
+];
+
+let pIdx=null,eIdx=0,score=0,repOk=false,resultats=[],indiceUsed=false;
+
+function lancerParcours(idx){
+  pIdx=idx;eIdx=0;score=0;resultats=[];repOk=false;
+  show('ecran-accueil',false);show('ecran-bilan',false);show('ecran-jeu',true);
+  document.getElementById('jeu-parcours-nom').textContent=PARCOURS[idx].nom;
+  afficherEnigme();
+}
+function afficherEnigme(){
+  repOk=false;indiceUsed=false;
+  const p=PARCOURS[pIdx],e=p.enigmes[eIdx],total=p.enigmes.length;
+  const pct=Math.round((eIdx/total)*100);
+  document.getElementById('progress-bar').style.width=pct+'%';
+  document.getElementById('jeu-score').innerHTML=score+' pts<small>SCORE</small>';
+  document.getElementById('jeu-enigme-info').textContent='Énigme '+(eIdx+1)+' / '+total;
+  const btn=document.getElementById('btn-suivant');
+  btn.disabled=true;
+  btn.textContent=(eIdx+1>=total)?'Voir le bilan →':'Suivant →';
+  const opts=e.opts.map((o,i)=>`<button class="option-btn" id="opt${i}" onclick="repondre(${i})"><span class="opt-lettre">${L[i]}</span>${o}</button>`).join('');
+  document.getElementById('zone-enigme').innerHTML=`<div class="enigme-card"><div class="enigme-num">Énigme ${eIdx+1} — ${e.q}</div><div class="enigme-contexte">${e.ctx}</div><div class="options-list">${opts}</div><div class="feedback-box" id="fb"></div><div class="indice-section"><button class="indice-toggle" onclick="afficherIndice()">Indice (−50 pts)</button><div class="indice-text" id="indice-text">${e.ind}</div></div></div>`;
+}
+function repondre(idx){
+  if(repOk)return;repOk=true;
+  const e=PARCOURS[pIdx].enigmes[eIdx],ok=idx===e.rep;
+  if(ok)score+=100;
+  resultats.push({q:e.q,ok});
+  for(let i=0;i<e.opts.length;i++){
+    const b=document.getElementById('opt'+i);
+    b.disabled=true;
+    if(i===e.rep)b.classList.add('correct');
+    if(i===idx&&!ok)b.classList.add('incorrect');
+  }
+  const fb=document.getElementById('fb');
+  fb.style.display='block';
+  fb.className='feedback-box '+(ok?'ok':'ko');
+  fb.textContent=e.fb;
+  document.getElementById('jeu-score').innerHTML=score+' pts<small>SCORE</small>';
+  document.getElementById('btn-suivant').disabled=false;
+}
+function afficherIndice(){
+  const t=document.getElementById('indice-text');
+  if(t.style.display!=='block'){
+    t.style.display='block';
+    if(!repOk&&!indiceUsed){score=Math.max(0,score-50);indiceUsed=true;document.getElementById('jeu-score').innerHTML=score+' pts<small>SCORE</small>';}
+  }
+}
+function enigmeSuivante(){
+  eIdx++;
+  if(eIdx>=PARCOURS[pIdx].enigmes.length)afficherBilan();
+  else afficherEnigme();
+}
+function afficherBilan(){
+  show('ecran-jeu',false);show('ecran-bilan',true);
+  const total=PARCOURS[pIdx].enigmes.length,maxS=total*100,pct=Math.round((score/maxS)*100),bonnes=resultats.filter(r=>r.ok).length;
+  document.getElementById('bilan-parcours-nom').textContent=PARCOURS[pIdx].nom;
+  document.getElementById('bilan-score-big').innerHTML='<span>'+score+'</span> pts';
+  document.getElementById('bilan-sous').textContent=bonnes+' / '+total+' bonnes réponses — '+pct+' %';
+  const m=document.getElementById('bilan-mention');
+  if(pct>=85){m.textContent='Expert sécurité privée';m.style.cssText='background:rgba(42,157,92,.15);color:#5acea0;border:1px solid rgba(42,157,92,.3)';}
+  else if(pct>=65){m.textContent='Bon niveau';m.style.cssText='background:rgba(58,123,213,.15);color:#7aabf0;border:1px solid rgba(58,123,213,.3)';}
+  else if(pct>=45){m.textContent='Notions acquises';m.style.cssText='background:rgba(201,161,69,.15);color:#e8c45a;border:1px solid rgba(201,161,69,.3)';}
+  else{m.textContent='À approfondir';m.style.cssText='background:rgba(184,59,42,.15);color:#e8735a;border:1px solid rgba(184,59,42,.3)';}
+  document.getElementById('bilan-stats').innerHTML=`<div class="bilan-stat"><div class="bilan-stat-num">${bonnes}</div><div class="bilan-stat-label">Bonnes réponses</div></div><div class="bilan-stat"><div class="bilan-stat-num">${total-bonnes}</div><div class="bilan-stat-label">Erreurs</div></div><div class="bilan-stat"><div class="bilan-stat-num">${pct}%</div><div class="bilan-stat-label">Score</div></div><div class="bilan-stat"><div class="bilan-stat-num">${score}</div><div class="bilan-stat-label">Points</div></div>`;
+  document.getElementById('bilan-recap-list').innerHTML=resultats.map(r=>`<div class="bilan-recap-item"><div class="recap-dot ${r.ok?'ok':'ko'}"></div>${r.q}</div>`).join('');
+}
+function retourAccueil(){show('ecran-accueil',true);show('ecran-jeu',false);show('ecran-bilan',false);}
+function rejouerParcours(){lancerParcours(pIdx);}
+function show(id,visible){
+  const el=document.getElementById(id);
+  if(!visible){el.style.display='none';return;}
+  if(id==='ecran-accueil')el.style.display='flex';
+  else if(id==='ecran-bilan')el.style.display='flex';
+  else el.style.display='block';
+}
+show('ecran-accueil',true);
+</script>
+</body>
+</html>
