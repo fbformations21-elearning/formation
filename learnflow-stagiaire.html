@@ -298,7 +298,16 @@ async function renderHome(){
     const score=getScore(mod.id,partieIdx);
     const isFinale=partie.evaluation_finale||partie.titre.includes('Évaluation finale');
     const seuil=isFinale?70:60;
-    const locked=gi>0&&!isPartieDone(all[gi-1].mod.id,all[gi-1].partieIdx);
+    // Débloquée si c'est la première partie, ou si la dernière partie
+    // avec questions avant celle-ci est validée
+    let locked=false;
+    if(gi>0){
+      let lastWithQ=null;
+      for(let k=gi-1;k>=0;k--){
+        if(all[k].partie.questions&&all[k].partie.questions.length>0){lastWithQ=all[k];break;}
+      }
+      if(lastWithQ&&!isPartieDone(lastWithQ.mod.id,lastWithQ.partieIdx)){locked=true;}
+    }
 
     let cardCls='partie-card'+(done?' done':locked?' locked':isFinale?' finale':'');
     let numBg=done?'var(--green-l)':locked?'var(--gray2)':isFinale?'var(--amber-l)':'var(--blue-l)';
