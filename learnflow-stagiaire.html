@@ -298,11 +298,16 @@ async function renderHome(){
     if(certs.length){
       document.getElementById('cert-section').style.display='block';
       document.getElementById('cert-home').innerHTML=buildCert(certs[0].score,new Date(certs[0].created_at));
-    }
+    } 
   }catch(e){}
 
   const all=getAllParties();
-  if(!all.length){document.getElementById('parties-list').innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3)">Aucun contenu disponible.</div>';return;}
+  if(!all.length){
+  if(!document.getElementById('parties-list').innerHTML.includes('Accéder au simulateur')){
+    document.getElementById('parties-list').innerHTML='<div style="text-align:center;padding:2rem;color:var(--text3)">Aucun contenu disponible.</div>';
+  }
+  return;
+}
 
   document.getElementById('parties-list').innerHTML=all.map((item,gi)=>{
     const {mod,partie,partieIdx}=item;
