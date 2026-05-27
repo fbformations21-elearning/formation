@@ -261,7 +261,19 @@ function getScore(mid,pidx){return PROGS[getCle(mid,pidx)]||0;}
 
 function getAllParties(){
   const f=SES.formation.data;
-  if(!f.modules)return[];
+  if(!f.modules){
+  // Si c'est un simulateur externe, afficher un bouton d'accès
+  if(f.simulateur_url){
+    document.getElementById('parties-list').innerHTML=
+      '<div style="text-align:center;padding:2rem">'+
+      '<div style="font-size:48px;margin-bottom:1rem">🖥️</div>'+
+      '<div style="font-size:18px;font-weight:600;margin-bottom:8px">'+f.title+'</div>'+
+      '<div style="font-size:14px;color:#6b6860;margin-bottom:1.5rem">'+f.desc+'</div>'+
+      '<a href="'+f.simulateur_url+'" target="_blank" style="display:inline-block;background:#185FA5;color:white;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none">▶ Accéder au simulateur</a>'+
+      '</div>';
+  }
+  return[];
+};
   const all=[];
   f.modules.forEach(mod=>{mod.parties.forEach((p,i)=>all.push({mod,partie:p,partieIdx:i}));});
   return all;
