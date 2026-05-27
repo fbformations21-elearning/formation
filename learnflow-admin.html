@@ -344,7 +344,7 @@ tbody tr:hover{background:var(--gray);}
 // CONFIGURATION SUPABASE
 // ══════════════════════════════════════
 const SUPA_URL='https://oebnvaxvmrmyvuiuuzwh.supabase.co';
-const SUPA_KEY='sb_publishable__oCF5Szn4auhOaUscwtplQ_JYOt-cJ8';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lYm52YXh2bXJteXZ1aXV1endoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODYwMTUsImV4cCI6MjA5MDU2MjAxNX0.pxqus1VcvJqZx-1gGsAsLJodsUD91JGRk4CQuWme7dQ';
 
 async function supa(method,table,body=null,filter=''){
   const url=`${SUPA_URL}/rest/v1/${table}${filter}`;
