@@ -213,10 +213,12 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--gray);m
 const SUPA_URL='https://oebnvaxvmrmyvuiuuzwh.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lYm52YXh2bXJteXZ1aXV1endoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODYwMTUsImV4cCI6MjA5MDU2MjAxNX0.pxqus1VcvJqZx-1gGsAsLJodsUD91JGRk4CQuWme7dQ';
 
-async function supa(method,table,body=null,filter=''){ 
+let _token='';
+
+async function supa(method,table,body=null,filter=''){
   const res=await fetch(`${SUPA_URL}/rest/v1/${table}${filter}`,{
     method,
-    headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+    headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':'','x-token':_token},
     body:body?JSON.stringify(body):null
   });
   if(!res.ok){const e=await res.text();throw new Error(e);}
