@@ -286,7 +286,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 
 async function enterToken(){
-  const token=document.getElementById('token-input').value.trim().toUpperCase();
+  const token=document.getElementById('token-input').value.trim().toUpperCase();_token=token;
   if(!token){showErr('Veuillez saisir votre code.');return;}
   const btn=document.getElementById('go-btn');
   btn.disabled=true;btn.textContent='Vérification...';
