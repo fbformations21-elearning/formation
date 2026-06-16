@@ -659,6 +659,8 @@ function saveFormation(){
   if(id){Object.assign(S.formations.find(x=>x.id===parseInt(id)),data);notif('Formation mise à jour','ok');}
   else{data.id=S.ids.f++;S.formations.push(data);notif('Formation créée','ok');}
   saveS();updateBadges();closeM('mf-modal');renderF();
+const formation = id ? S.formations.find(x=>x.id===parseInt(id)) : S.formations[S.formations.length-1];
+syncFormationToSupabase(formation).catch(e=>console.error('Sync Supabase échoué:',e));
 }
 function delF(id){if(!confirm('Supprimer cette formation ?'))return;S.formations=S.formations.filter(x=>x.id!==id);saveS();updateBadges();renderF();notif('Supprimée');}
 
