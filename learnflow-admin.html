@@ -691,22 +691,8 @@ async function saveApprenant(){
     notif('Création en cours...','');
     let supaId=null,errMsg='';
     try{
-      const resp=await fetch(SUPA_URL+'/rest/v1/apprenants',{
-        method:'POST',
-        headers:{
-          'apikey':SUPA_KEY,
-          'Authorization':'Bearer '+SUPA_KEY,
-          'Content-Type':'application/json',
-          'Prefer':'return=representation'
-        },
-        body:JSON.stringify(dataPayload)
-      });
-      if(resp.ok){
-        const rows=await resp.json();
-        if(rows&&rows[0]&&rows[0].id) supaId=rows[0].id;
-      } else {
-        errMsg=await resp.text();
-      }
+      const rows=await supaReq('POST','apprenants',dataPayload);
+      if(rows&&rows[0]&&rows[0].id) supaId=rows[0].id;
     }catch(e){errMsg=e.message;}
 
     d.id=supaId||S.ids.a++;
