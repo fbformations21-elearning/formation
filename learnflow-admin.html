@@ -703,7 +703,7 @@ async function saveApprenant(){
           'Content-Type':'application/json',
           'Prefer':'return=representation'
         },
-        body:JSON.stringify({data:dataPayload})
+        body:JSON.stringify(dataPayload))
       });
       if(resp.ok){
         const rows=await resp.json();
