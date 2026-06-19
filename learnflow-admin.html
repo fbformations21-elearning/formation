@@ -678,23 +678,19 @@ async function saveApprenant(){
   const dataPayload={prenom:d.prenom,nom:d.nom,email:d.email||'',entreprise:d.entreprise||'',poste:d.poste||'',notes:d.notes||''};
 
   if(eid){
-    // ── Modification ──────────────────────────────────────────────────────
     const existing=S.apprenants.find(x=>x.id===parseInt(eid));
     if(existing) Object.assign(existing,d);
     saveS(); updateBadges(); closeM('ma-modal'); renderA();
     try{
-      await supaReq('PATCH','apprenants',{data:dataPayload},'?id=eq.'+eid);
+      await supaReq('PATCH','apprenants',dataPayload,'?id=eq.'+eid);
       notif('Mis à jour ✓','ok');
     }catch(e){
       notif('Mis à jour localement (erreur Supabase: '+e.message+')','');
     }
   } else {
-    // ── Création ──────────────────────────────────────────────────────────
     notif('Création en cours...','');
-    let supaId = null;
-    let errMsg = '';
+    let supaId=null,errMsg='';
     try{
-      // POST sans id → Supabase génère l'id auto-increment
       const resp=await fetch(SUPA_URL+'/rest/v1/apprenants',{
         method:'POST',
         headers:{
@@ -703,18 +699,18 @@ async function saveApprenant(){
           'Content-Type':'application/json',
           'Prefer':'return=representation'
         },
-        body:JSON.stringify(dataPayload))
+        body:JSON.stringify(dataPayload)
       });
       if(resp.ok){
         const rows=await resp.json();
         if(rows&&rows[0]&&rows[0].id) supaId=rows[0].id;
       } else {
-        errMsg = await resp.text();
+        errMsg=await resp.text();
       }
-    }catch(e){ errMsg=e.message; }
+    }catch(e){errMsg=e.message;}
 
-    d.id = supaId || S.ids.a++;
-    if(supaId && supaId>=S.ids.a) S.ids.a=supaId+1;
+    d.id=supaId||S.ids.a++;
+    if(supaId&&supaId>=S.ids.a) S.ids.a=supaId+1;
     S.apprenants.push(d);
     saveS(); updateBadges(); closeM('ma-modal'); renderA();
 
