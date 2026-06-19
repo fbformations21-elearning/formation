@@ -422,7 +422,7 @@ async function syncApprenantToSupabase(a){
   // Supabase stocke les données dans un champ jsonb "data"
   const payload={id:a.id,data:{prenom:a.prenom,nom:a.nom,email:a.email||'',entreprise:a.entreprise||'',poste:a.poste||'',notes:a.notes||''}};
   try{
-    await supaReq('POST','apprenants',payload);
+await supaReq('POST','apprenants',{data:payload});
   }catch(e){
     // Si déjà existant, on met à jour
     await supaReq('PATCH','apprenants',{data:payload.data},'?id=eq.'+a.id);
@@ -691,7 +691,7 @@ async function saveApprenant(){
     notif('Création en cours...','');
     let supaId=null,errMsg='';
     try{
-      const rows=await supaReq('POST','apprenants',dataPayload);
+   const rows=await supaReq('POST','apprenants',{data:dataPayload});
       if(rows&&rows[0]&&rows[0].id) supaId=rows[0].id;
     }catch(e){errMsg=e.message;}
 
