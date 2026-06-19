@@ -390,7 +390,7 @@ async function supaReq(method,table,body=null,filter=''){
   try{
     const res=await fetch(`${SUPA_URL}/rest/v1/${table}${filter}`,{
       method,
-      headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':method==='POST'?'return=representation':''},
+     headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,...(method==='POST'?{'Prefer':'return=representation'}:{})},
       body:body?JSON.stringify(body):null
     });
     if(!res.ok){const e=await res.text();console.warn('Supabase err:',e);return null;}
