@@ -315,7 +315,7 @@ function selectFormat(fmt){
 
 window.addEventListener('DOMContentLoaded',()=>{
   const urlToken=new URLSearchParams(window.location.search).get('token');
-  if(urlToken){document.getElementById('token-input').value=urlToken;setTimeout(()=>enterToken(),400);}
+  if(urlToken){document.getElementById('token-input').value=urlToken;} // token pré-rempli mais pas auto-lancé
   const urlFmt=new URLSearchParams(window.location.search).get('format');
   if(urlFmt==='tablette') selectFormat('tablette');
 });
