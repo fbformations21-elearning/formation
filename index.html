@@ -5835,9 +5835,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const wrapper = document.getElementById('sim-wrapper');
     const scale = 0.6;
     wrapper.style.transform = 'scale(' + scale + ')';
-    wrapper.style.transformOrigin = 'top left';
+    wrapper.style.transformOrigin = 'top center';
     wrapper.style.width = Math.round(100 / scale) + '%';
     wrapper.style.height = Math.round(100 / scale) + 'vh';
+    wrapper.style.marginLeft = '-' + Math.round((100 / scale - 100) / 2) + '%';
     document.body.style.overflow = 'hidden';
   }
   // ──────────────────────────────────────────────────────────────────────────
