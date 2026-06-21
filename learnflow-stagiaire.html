@@ -102,6 +102,22 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--gray);m
     <label style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block">Votre code d'accès</label>
     <input class="inp" id="token-input" type="text" placeholder="LF-XXXXXXXX" maxlength="12" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')enterToken()">
     <div style="font-size:11px;color:var(--text3);margin-top:6px">Ce code vous a été transmis par votre formateur</div>
+
+    <!-- Sélecteur de format d'affichage -->
+    <div style="margin-top:1.25rem;margin-bottom:0.25rem">
+      <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:8px">Choisissez votre support d'affichage</div>
+      <div style="display:flex;gap:8px">
+        <button id="fmt-pc" onclick="selectFormat('pc')" style="flex:1;padding:10px 8px;border:2px solid var(--blue);border-radius:var(--r);background:var(--blue);color:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:22px">🖥️</span>
+          <span>Ordinateur</span>
+        </button>
+        <button id="fmt-tablette" onclick="selectFormat('tablette')" style="flex:1;padding:10px 8px;border:2px solid var(--gray3);border-radius:var(--r);background:white;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:22px">📱</span>
+          <span>Tablette / Smartphone</span>
+        </button>
+      </div>
+    </div>
+
     <button class="go-btn" id="go-btn" onclick="enterToken()">Accéder à ma formation →</button>
     <div class="err-box" id="token-err">Code invalide ou expiré. Contactez votre formateur.</div>
   </div>
@@ -280,9 +296,28 @@ async function checkFingerprint(lien){
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ── FORMAT D'AFFICHAGE ────────────────────────────────────────────────────────
+let selectedFormat='pc';
+
+function selectFormat(fmt){
+  selectedFormat=fmt;
+  const btnPc=document.getElementById('fmt-pc');
+  const btnTab=document.getElementById('fmt-tablette');
+  if(fmt==='pc'){
+    btnPc.style.background='var(--blue)';btnPc.style.color='white';btnPc.style.borderColor='var(--blue)';
+    btnTab.style.background='white';btnTab.style.color='var(--text2)';btnTab.style.borderColor='var(--gray3)';
+  } else {
+    btnTab.style.background='var(--blue)';btnTab.style.color='white';btnTab.style.borderColor='var(--blue)';
+    btnPc.style.background='white';btnPc.style.color='var(--text2)';btnPc.style.borderColor='var(--gray3)';
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 window.addEventListener('DOMContentLoaded',()=>{
   const urlToken=new URLSearchParams(window.location.search).get('token');
   if(urlToken){document.getElementById('token-input').value=urlToken;setTimeout(()=>enterToken(),400);}
+  const urlFmt=new URLSearchParams(window.location.search).get('format');
+  if(urlFmt==='tablette') selectFormat('tablette');
 });
 
 async function enterToken(){
@@ -339,7 +374,7 @@ function getAllParties(){
         '<div style="font-size:48px;margin-bottom:1rem">🖥️</div>'+
         '<div style="font-size:18px;font-weight:600;margin-bottom:8px">'+f.title+'</div>'+
         '<div style="font-size:14px;color:#6b6860;margin-bottom:1.5rem">'+f.desc+'</div>'+
-        '<a href="'+f.simulateur_url+'" target="_blank" style="display:inline-block;background:#185FA5;color:white;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none">▶ Accéder au simulateur</a>'+
+        '<a href="'+(selectedFormat==='tablette'?(f.simulateur_url+(f.simulateur_url.includes('?')?'&':'?')+'format=tablette'):f.simulateur_url)+'" target="_blank" style="display:inline-block;background:#185FA5;color:white;padding:14px 32px;border-radius:10px;font-size:16px;font-weight:600;text-decoration:none">▶ Accéder au simulateur</a>'+
         '</div>';
     }
     return[];
