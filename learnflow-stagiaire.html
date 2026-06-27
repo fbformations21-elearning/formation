@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LearnFlow — Portail Formation</title>
+<title>FBFormations21 e-Académie — Portail Formation</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -135,7 +135,7 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--gray);m
     <div style="background:#FCEBEB;color:#A32D2D;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:1.5rem">
       ⚠️ Si vous êtes le titulaire, contactez votre formateur pour obtenir un nouveau lien.
     </div>
-    <div style="font-size:11px;color:#9a9690">LearnFlow Academy — Protection anti-partage</div>
+    <div style="font-size:11px;color:#9a9690">FBFormations21 e-Académie — Protection anti-partage</div>
   </div>
 </div>
 
@@ -585,7 +585,7 @@ function buildCert(score,date){
   const mention=score>=90?'Excellent':score>=80?'Très bien':score>=70?'Bien':'Passable';
   const d=date instanceof Date?date:new Date(date);
   return`<div class="cert">
-    <div style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:white;font-size:11px;font-weight:600;padding:4px 16px;border-radius:99px;margin-bottom:1rem">🎓 LearnFlow Academy</div>
+    <div style="display:inline-flex;align-items:center;gap:6px;background:var(--green);color:white;font-size:11px;font-weight:600;padding:4px 16px;border-radius:99px;margin-bottom:1rem">🎓 FBFormations21 e-Académie</div>
     <div style="font-size:12px;color:var(--blue);margin-bottom:8px;font-weight:500">certifie que</div>
     <div style="font-size:26px;font-weight:700;color:var(--blue-d);margin-bottom:4px">${a.prenom} ${a.nom}</div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">${a.poste||a.entreprise||''}</div>
